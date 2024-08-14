@@ -1,0 +1,19 @@
+spring:
+  application.name: FitTools
+  datasource:
+    url: jdbc:mysql:localhost:2345:/fittools
+    username: root
+    password: 123456
+  mail:
+    username: openfittools@163.com
+    password: INYCFIEWDGXKJUNT
+    host: smtp.163.com
+    port: 465
+    protocol: smtps
+    default-encoding: UTF-8
+    properties:
+      mail:
+        smtp:
+          socketFactoryClass: javax.net.ssl.SSLSocketFactory
+          debug: true
+          ssl: true
