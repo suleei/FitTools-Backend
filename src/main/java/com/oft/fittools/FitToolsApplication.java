@@ -5,7 +5,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-@MapperScan("com.oft.fittools")
+@MapperScan("com.oft.fittools.mapper")
 public class FitToolsApplication {
 
 	public static void main(String[] args) {
