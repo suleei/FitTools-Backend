@@ -38,7 +38,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception{
         httpSecurity
-                .authorizeHttpRequests(auth->auth.requestMatchers("/login/*").anonymous().anyRequest().authenticated());
+                .authorizeHttpRequests(auth->auth.requestMatchers("/login/**").anonymous().anyRequest().authenticated());
         httpSecurity.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         httpSecurity.csrf(crsf->crsf.disable());
         return httpSecurity.build();

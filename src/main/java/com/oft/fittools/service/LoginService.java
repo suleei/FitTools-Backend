@@ -1,14 +1,19 @@
 package com.oft.fittools.service;
 
-import com.oft.fittools.dto.resp.CaptchaRespDTO;
-import com.oft.fittools.dto.req.EmailSendingReqDTO;
-import com.oft.fittools.dto.req.UserRegistrationReqDTO;
+import com.oft.fittools.dto.login.*;
+import com.oft.fittools.dto.login.CaptchaRespDTO;
 
 public interface LoginService {
 
     public CaptchaRespDTO getCaptcha();
 
-    public void eMailSending(EmailSendingReqDTO emailSendingReqDTO);
+    public void eMailSending(RegistrationEmailSendingReqDTO registrationEmailSendingReqDTO);
 
     public void register(UserRegistrationReqDTO userRegistrationReqDTO);
+
+    public void retrieveEmailSending(RetrieveEmailSendingReqDTO retrieveEmailSendingReqDTO);
+
+    void retrieve(UserRetrieveReqDTO userRetrieveReqDTO);
+
+    String login(UserLoginReqDTO loginReqDTO);
 }

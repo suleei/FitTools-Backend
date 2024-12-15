@@ -1,4 +1,4 @@
-package com.oft.fittools.dto.resp;
+package com.oft.fittools.dto.login;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;

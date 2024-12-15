@@ -1,12 +1,11 @@
-package com.oft.fittools.dto.req;
+package com.oft.fittools.dto.login;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-public class EmailSendingReqDTO {
+public class RegistrationEmailSendingReqDTO {
     @NotBlank(message="邮箱不能为空")
     @Size(max=30,message = "邮箱最大长度为30位")
     private String email;

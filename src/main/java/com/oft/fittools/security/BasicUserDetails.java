@@ -1,6 +1,6 @@
 package com.oft.fittools.security;
 
-import com.oft.fittools.po.UserBasicInfo;
+import com.oft.fittools.po.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
@@ -10,7 +10,7 @@ import java.util.Collection;
 @Data
 @AllArgsConstructor
 public class BasicUserDetails implements UserDetails {
-    private UserBasicInfo userBasicInfo;
+    private User user;
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;
@@ -18,11 +18,11 @@ public class BasicUserDetails implements UserDetails {
 
     @Override
     public String getPassword() {
-        return userBasicInfo.getPassword();
+        return user.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return userBasicInfo.getUsername();
+        return user.getUsername();
     }
 }

@@ -7,4 +7,21 @@
         insert into user(username, password, email)
         values(#{username}, #{password}, #{email})
     </select>
+    <select id="userEmailMatch" resultType="java.lang.Integer">
+        select count(*)
+        from user
+        where username = #{username} and email = #{email}
+    </select>
+
+    <select id="getUserByUsername" resultType="com.oft.fittools.po.User">
+        select *
+        from user
+        where username = #{username}
+    </select>
+
+    <update id="updatePassword">
+        update user
+        set password = #{password}
+        where username= #{username}
+    </update>
 </mapper>
