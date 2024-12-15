@@ -32,7 +32,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String jwt = request.getHeader("jwt");
+        String jwt = request.getHeader("Authorization");
         if(!StringUtils.hasText(jwt)){
             filterChain.doFilter(request,response);
             return;
