@@ -13,4 +13,6 @@ public interface UserMapper {
     void updatePassword(String username, String password);
 
     User getUserByUsername(String username);
+
+    void updateAvatar(String username, String avatar);
 }

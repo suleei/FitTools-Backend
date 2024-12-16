@@ -77,12 +77,12 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public String login(UserLoginReqDTO loginReqDTO) {
+    public UserLoginRespDTO login(UserLoginReqDTO loginReqDTO) {
         Authentication authentication= authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginReqDTO.getUsername(), loginReqDTO.getPassword()));
         if(authentication==null) throw new RuntimeException("用户名或密码错误");
         Calendar expireTime = Calendar.getInstance();
         expireTime.add(Calendar.HOUR,24);
         String jwt = JWT.create().withClaim("username",loginReqDTO.getUsername()).withExpiresAt(expireTime.getTime()).sign(Algorithm.HMAC256(signatureKey));
-        return jwt;
+        return new UserLoginRespDTO(loginReqDTO.getUsername(), jwt);
     }
 }

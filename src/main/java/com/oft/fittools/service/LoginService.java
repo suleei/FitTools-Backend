@@ -15,5 +15,5 @@ public interface LoginService {
 
     void retrieve(UserRetrieveReqDTO userRetrieveReqDTO);
 
-    String login(UserLoginReqDTO loginReqDTO);
+    UserLoginRespDTO login(UserLoginReqDTO loginReqDTO);
 }

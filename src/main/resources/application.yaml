@@ -14,3 +14,8 @@ mybatis:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 jwt:
   signatureKey: "Echo 42"
+
+minio:
+  endpoint: http://127.0.0.1:9000
+  accessKey: ZxnBGusK8kSBMbfqan1b
+  secretKey: rzAYlE1Bh3DRxLSJTqpujiaJTO5m7vPRZIOb9Rjt
