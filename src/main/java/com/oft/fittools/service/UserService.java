@@ -8,4 +8,6 @@ public interface UserService {
     void uploadAvatar(MultipartFile file);
 
     GetUserInfoRespDTO getUserInfo();
+
+    String updateUsername(String username);
 }

@@ -29,4 +29,9 @@
         set avatar = #{avatar}
         where username= #{username}
     </update>
+    <update id="updateUsername">
+        update user
+        set username = #{newName}
+        where username= #{oldName}
+    </update>
 </mapper>

@@ -15,4 +15,6 @@ public interface UserMapper {
     User getUserByUsername(String username);
 
     void updateAvatar(String username, String avatar);
+
+    void updateUsername(String oldName, String newName);
 }

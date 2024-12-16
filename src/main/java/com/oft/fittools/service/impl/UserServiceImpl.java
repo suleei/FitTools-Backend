@@ -4,6 +4,8 @@ import cn.hutool.Hutool;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Snowflake;
 import cn.hutool.core.util.IdUtil;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
 import com.oft.fittools.dto.user.GetUserInfoRespDTO;
 import com.oft.fittools.mapper.UserMapper;
 import com.oft.fittools.po.User;
@@ -18,6 +20,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Calendar;
+
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -28,6 +32,9 @@ public class UserServiceImpl implements UserService {
 
     @Value("${minio.endpoint}")
     private String endpoint;
+
+    @Value("${jwt.signatureKey}")
+    private String signatureKey;
 
     @Override
     public void uploadAvatar(MultipartFile file) {
@@ -76,5 +83,13 @@ public class UserServiceImpl implements UserService {
             avatarURL += "avatar.png";
         dto.setAvatar(avatarURL);
         return dto;
+    }
+
+    @Override
+    public String updateUsername(String username) {
+        userMapper.updateUsername(SecurityContextHolder.getContext().getAuthentication().getName(),username);
+        Calendar expireTime = Calendar.getInstance();
+        expireTime.add(Calendar.HOUR,24);
+        return JWT.create().withClaim("username",username).withExpiresAt(expireTime.getTime()).sign(Algorithm.HMAC256(signatureKey));
     }
 }
