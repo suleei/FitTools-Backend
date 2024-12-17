@@ -52,6 +52,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
         }
         if(userMapper.getUserByUsername(username)==null){
             handlerExceptionResolver.resolveException(request,response,null,new UsernameNotFoundException("Username not found"));
+            return;
         }
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken= new UsernamePasswordAuthenticationToken(username,null,null);
         SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);

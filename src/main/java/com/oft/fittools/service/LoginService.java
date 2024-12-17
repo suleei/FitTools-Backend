@@ -5,7 +5,6 @@ import com.oft.fittools.dto.login.CaptchaRespDTO;
 
 public interface LoginService {
 
-    public CaptchaRespDTO getCaptcha();
 
     public void eMailSending(RegistrationEmailSendingReqDTO registrationEmailSendingReqDTO);
 

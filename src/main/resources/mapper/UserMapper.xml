@@ -34,4 +34,9 @@
         set username = #{newName}
         where username= #{oldName}
     </update>
+    <update id="updateEmail">
+        update user
+        set email = #{email}
+        where username= #{username}
+    </update>
 </mapper>

@@ -12,11 +12,6 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class LoginController {
     private final LoginService loginService;
-    @GetMapping("/captcha")
-    public ResponseResult captcha() {
-        return ResponseResult.success(loginService.getCaptcha());
-    }
-
     @PostMapping("/register/email")
     public ResponseResult emailSending(@RequestBody @Validated RegistrationEmailSendingReqDTO registrationEmailSendingReqDTO) {
         loginService.eMailSending(registrationEmailSendingReqDTO);

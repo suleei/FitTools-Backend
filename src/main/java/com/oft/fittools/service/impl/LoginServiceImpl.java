@@ -8,6 +8,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.oft.fittools.dto.login.*;
 import com.oft.fittools.dto.login.CaptchaRespDTO;
 import com.oft.fittools.mapper.UserMapper;
+import com.oft.fittools.service.CaptchaService;
 import com.oft.fittools.service.LoginService;
 import com.oft.fittools.service.MailSendingService;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,6 @@ import java.util.concurrent.*;
 @Service
 @RequiredArgsConstructor
 public class LoginServiceImpl implements LoginService {
-    private final String captchaKeyPrefix = "captcha:";
     private final StringRedisTemplate stringRedisTemplate;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
@@ -33,28 +33,20 @@ public class LoginServiceImpl implements LoginService {
     @Value("${jwt.signatureKey}")
     private String signatureKey;
     private final AuthenticationManager authenticationManager;
+    private final CaptchaService captchaService;
 
-
-    @Override
-    public CaptchaRespDTO getCaptcha() {
-        LineCaptcha lineCaptcha = CaptchaUtil.createLineCaptcha(120, 50);
-        stringRedisTemplate.opsForValue().set(captchaKeyPrefix+lineCaptcha.hashCode(),lineCaptcha.getCode(),2, TimeUnit.MINUTES);
-        return new CaptchaRespDTO(lineCaptcha.hashCode(), lineCaptcha.getImageBase64());
-    }
 
     @Override
     public void eMailSending(RegistrationEmailSendingReqDTO registrationEmailSendingReqDTO) {
         if(!Validator.isEmail(registrationEmailSendingReqDTO.getEmail())) throw new RuntimeException("邮箱格式非法");
-        if(!registrationEmailSendingReqDTO.getCaptchaCode().equals(stringRedisTemplate.opsForValue().get(captchaKeyPrefix+ registrationEmailSendingReqDTO.getCaptchaHash()))) throw new RuntimeException("输入验证码错误");
-        stringRedisTemplate.delete(captchaKeyPrefix+ registrationEmailSendingReqDTO.getCaptchaHash());
+        captchaService.verifyCaptcha(registrationEmailSendingReqDTO.getCaptchaHash(), registrationEmailSendingReqDTO.getCaptchaCode());
         mailSendingService.sendCaptcha(registrationEmailSendingReqDTO.getEmail(), "用户注册");
     }
 
     @Override
     public void retrieveEmailSending(RetrieveEmailSendingReqDTO retrieveEmailSendingReqDTO) {
         if(!Validator.isEmail(retrieveEmailSendingReqDTO.getEmail())) throw new RuntimeException("邮箱格式非法");
-        if(!retrieveEmailSendingReqDTO.getCaptchaCode().equals(stringRedisTemplate.opsForValue().get(captchaKeyPrefix+retrieveEmailSendingReqDTO.getCaptchaHash()))) throw new RuntimeException("输入验证码错误");
-        stringRedisTemplate.delete(captchaKeyPrefix+retrieveEmailSendingReqDTO.getCaptchaHash());
+        captchaService.verifyCaptcha(retrieveEmailSendingReqDTO.getCaptchaHash(), retrieveEmailSendingReqDTO.getCaptchaCode());
         if(userMapper.userEmailMatch(retrieveEmailSendingReqDTO.getUsername(), retrieveEmailSendingReqDTO.getEmail())==0) throw new RuntimeException("用户名或邮箱错误");
         mailSendingService.sendCaptcha(retrieveEmailSendingReqDTO.getEmail(),"密码找回");
     }
