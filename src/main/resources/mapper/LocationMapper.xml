@@ -1,0 +1,19 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.oft.fittools.mapper.LocationMapper">
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into location(district, address, name, longitude, latitude)
+        values(#{district}, #{address}, #{name}, #{longitude}, #{latitude})
+    </insert>
+    <delete id="delete">
+        delete from location
+        where id = #{id}
+    </delete>
+    <select id="select" resultType="com.oft.fittools.po.Location">
+        select *
+        from location
+        where id = #{id}
+    </select>
+</mapper>

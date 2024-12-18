@@ -1,10 +1,6 @@
 package com.oft.fittools.service;
 
-import com.oft.fittools.dto.user.EmailModificationReqDTO;
-import com.oft.fittools.dto.user.EmailSendingReqDTO;
-import com.oft.fittools.dto.user.GetUserInfoRespDTO;
-import com.oft.fittools.dto.user.NewEmailSendingReqDTO;
-import jakarta.validation.constraints.Size;
+import com.oft.fittools.dto.user.*;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface UserService {
@@ -22,4 +18,8 @@ public interface UserService {
     void modifyEmail(EmailModificationReqDTO emailModificationReqDTO);
 
     void sendNewEmailCaptcha(NewEmailSendingReqDTO newEmailSendingReqDTO);
+
+    void updateAddress(AddressDTO addressDTO);
+
+    AddressDTO getAddress();
 }

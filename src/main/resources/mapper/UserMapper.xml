@@ -39,4 +39,9 @@
         set email = #{email}
         where username= #{username}
     </update>
+    <update id="updateLocationId">
+        update user
+        set location_id = #{locationId}
+        where username= #{username}
+    </update>
 </mapper>

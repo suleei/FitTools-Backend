@@ -1,5 +1,7 @@
 package com.oft.fittools;
 
+import com.oft.fittools.mapper.LocationMapper;
+import com.oft.fittools.po.Location;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import io.minio.UploadObjectArgs;
@@ -20,17 +22,5 @@ import java.security.NoSuchAlgorithmException;
 @SpringBootTest
 class FitToolsApplicationTests {
     @Autowired
-    private MinioClient minioClient;
-
-    @Test
-    void fileUpload() throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
-        FileInputStream fileInputStream = new FileInputStream(new File("src/test/java/com/oft/fittools/2.png"));
-        minioClient.putObject(
-                PutObjectArgs.builder()
-                        .bucket("avatar")
-                        .object("test1.png")
-                        .stream(fileInputStream, fileInputStream.available(), -1)
-                        .build()
-        );
-    }
+    private LocationMapper locationMapper;
 }

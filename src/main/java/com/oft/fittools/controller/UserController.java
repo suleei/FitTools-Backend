@@ -1,7 +1,6 @@
 package com.oft.fittools.controller;
 
-import cn.hutool.core.lang.Validator;
-import cn.hutool.system.UserInfo;
+import com.oft.fittools.dto.user.AddressDTO;
 import com.oft.fittools.dto.user.EmailModificationReqDTO;
 import com.oft.fittools.dto.user.EmailSendingReqDTO;
 import com.oft.fittools.dto.user.NewEmailSendingReqDTO;
@@ -57,5 +56,16 @@ public class UserController {
     public ResponseResult modifyEmail(@RequestBody @Validated EmailModificationReqDTO emailModificationReqDTO){
         userService.modifyEmail(emailModificationReqDTO);
         return ResponseResult.success();
+    }
+
+    @PostMapping("/address")
+    public ResponseResult updateAddress(@RequestBody @Validated AddressDTO addressDTO) {
+        userService.updateAddress(addressDTO);
+        return ResponseResult.success();
+    }
+
+    @GetMapping("/address")
+    public ResponseResult getAddress() {
+        return ResponseResult.success(userService.getAddress());
     }
 }

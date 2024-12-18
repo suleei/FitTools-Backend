@@ -21,4 +21,7 @@ public interface UserMapper {
     void updateUsername(String oldName, String newName);
 
     void updateEmail(String username, String email);
+
+    void updateLocationId(String username, Integer locationId);
+
 }

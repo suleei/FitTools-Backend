@@ -1,19 +1,17 @@
 package com.oft.fittools.service.impl;
 
-import cn.hutool.Hutool;
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Snowflake;
 import cn.hutool.core.util.IdUtil;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.oft.fittools.dto.user.EmailModificationReqDTO;
-import com.oft.fittools.dto.user.EmailSendingReqDTO;
-import com.oft.fittools.dto.user.GetUserInfoRespDTO;
-import com.oft.fittools.dto.user.NewEmailSendingReqDTO;
+import com.oft.fittools.dto.user.*;
+import com.oft.fittools.mapper.LocationMapper;
 import com.oft.fittools.mapper.UserMapper;
+import com.oft.fittools.po.Location;
 import com.oft.fittools.po.User;
+import com.oft.fittools.security.UserDetailsServiceImpl;
 import com.oft.fittools.service.CaptchaService;
 import com.oft.fittools.service.MailSendingService;
 import com.oft.fittools.service.UserService;
@@ -25,6 +23,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Calendar;
@@ -35,6 +34,7 @@ public class UserServiceImpl implements UserService {
 
     private final MinioClient minioClient;
     private final UserMapper userMapper;
+    private final UserDetailsServiceImpl userDetailsServiceImpl;
     private Snowflake snowflake = IdUtil.createSnowflake(1,1);
 
     @Value("${minio.endpoint}")
@@ -45,6 +45,7 @@ public class UserServiceImpl implements UserService {
 
     private final CaptchaService  captchaService;
     private final MailSendingService mailSendingService;
+    private final LocationMapper locationMapper;
 
     @Override
     public void uploadAvatar(MultipartFile file) {
@@ -135,5 +136,28 @@ public class UserServiceImpl implements UserService {
         if(!user.getUsername().equals(decodedJWT.getClaim("username").asString())) throw new RuntimeException("授权用户名不一致");
         if(!user.getEmail().equals(decodedJWT.getClaim("email").asString())) throw new RuntimeException("授权邮箱不一致");
         userMapper.updateEmail(user.getUsername(),emailModificationReqDTO.getEmail());
+    }
+
+    @Override
+    @Transactional
+    public void updateAddress(AddressDTO addressDTO) {
+        User user = userMapper.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        Location location = new Location();
+        BeanUtils.copyProperties(addressDTO,location);
+        locationMapper.insert(location);
+        userMapper.updateLocationId(user.getUsername(), location.getId());
+        if(user.getLocation_id()!=null){
+            locationMapper.delete(user.getLocation_id());
+        }
+    }
+
+    @Override
+    public AddressDTO getAddress() {
+        User user = userMapper.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        if(user.getLocation_id()==null) return new AddressDTO("未设置","未设置","未设置");
+        Location location = locationMapper.select(user.getLocation_id());
+        AddressDTO addressDTO = new AddressDTO();
+        BeanUtils.copyProperties(location, addressDTO);
+        return addressDTO;
     }
 }
