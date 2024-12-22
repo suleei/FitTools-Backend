@@ -24,4 +24,7 @@ public interface UserMapper {
 
     void updateLocationId(String username, Integer locationId);
 
+    void setDevice(Integer deviceId, Integer userId);
+
+    void setCallSign(String callSign, Integer userId);
 }

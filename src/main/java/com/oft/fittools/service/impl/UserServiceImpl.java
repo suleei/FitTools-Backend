@@ -160,4 +160,10 @@ public class UserServiceImpl implements UserService {
         BeanUtils.copyProperties(location, addressDTO);
         return addressDTO;
     }
+
+    @Override
+    public void setCallSign(String callSign) {
+        User user = userMapper.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        userMapper.setCallSign(callSign, user.getId());
+    }
 }

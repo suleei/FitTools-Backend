@@ -1,6 +1,7 @@
 package com.oft.fittools.service;
 
 import com.oft.fittools.dto.user.*;
+import jakarta.validation.constraints.Size;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface UserService {
@@ -22,4 +23,6 @@ public interface UserService {
     void updateAddress(AddressDTO addressDTO);
 
     AddressDTO getAddress();
+
+    void setCallSign(@Size(min=1, max=10) String callSign);
 }

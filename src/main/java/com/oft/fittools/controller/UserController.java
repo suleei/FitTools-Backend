@@ -68,4 +68,10 @@ public class UserController {
     public ResponseResult getAddress() {
         return ResponseResult.success(userService.getAddress());
     }
+
+    @PutMapping("/call_sign")
+    public ResponseResult setCallSign(@RequestParam @Size(min=1, max=10) String callSign) {
+        userService.setCallSign(callSign);
+        return ResponseResult.success();
+    }
 }

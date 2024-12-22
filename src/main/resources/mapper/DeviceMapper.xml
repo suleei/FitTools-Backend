@@ -1,0 +1,25 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.oft.fittools.mapper.DeviceMapper">
+    <insert id="insert">
+        insert into device(user_id,name,power,antenna)
+        values(#{user_id},#{name},#{power},#{antenna})
+    </insert>
+    <delete id="delete">
+        delete from device
+        where
+            id = #{deviceId} and user_id = #{userId}
+    </delete>
+    <select id="getDeviceByUserId" resultType="com.oft.fittools.po.Device">
+        select *
+        from device
+        where user_id = #{user_id}
+    </select>
+    <select id="getDeviceByIdAndUserId" resultType="com.oft.fittools.po.Device">
+        select *
+        from device
+        where id = #{deviceId} and user_id = #{userId}
+    </select>
+</mapper>

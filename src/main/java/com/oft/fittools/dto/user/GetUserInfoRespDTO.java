@@ -10,4 +10,5 @@ public class GetUserInfoRespDTO {
     private String email;
     private String nickname;
     private String avatar;
+    private String call_sign;
 }

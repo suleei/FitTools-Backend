@@ -12,4 +12,6 @@ public class User {
     private String password;
     private String avatar;
     private Integer location_id;
+    private Integer device_id;
+    private String call_sign;
 }

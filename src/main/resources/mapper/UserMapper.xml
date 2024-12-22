@@ -44,4 +44,14 @@
         set location_id = #{locationId}
         where username= #{username}
     </update>
+    <update id="setDevice">
+        update user
+        set device_id = #{deviceId}
+        where id = #{userId}
+    </update>
+    <update id="setCallSign">
+        update user
+        set call_sign = #{callSign}
+        where id = #{userId}
+    </update>
 </mapper>
