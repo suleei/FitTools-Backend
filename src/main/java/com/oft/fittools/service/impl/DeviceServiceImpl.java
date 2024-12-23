@@ -63,4 +63,14 @@ public class DeviceServiceImpl implements DeviceService {
         if(user.getDevice_id()!=null&&user.getDevice_id()==deviceId) userMapper.setDevice(null, user.getId());
         else userMapper.setDevice(deviceId, user.getId());
     }
+
+    @Override
+    public DeviceDTO getDefaultDevice() {
+        User user=userMapper.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        DeviceDTO deviceDTO = new DeviceDTO();
+        if(user.getDevice_id()==null) return deviceDTO;
+        Device device = deviceMapper.getDeviceByIdAndUserId(user.getDevice_id(),user.getId());
+        BeanUtils.copyProperties(device,deviceDTO);
+        return deviceDTO;
+    }
 }

@@ -1,0 +1,17 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.oft.fittools.mapper.CommunicationLogMapper">
+    <insert id="insert">
+        insert into communication_log(user_id, source_call_sign, target_call_sign, source_address, source_district, source_lng, source_lat, target_address, target_lng, target_lat, source_device, target_device, source_antenna, target_antenna, source_power, target_power, frequency, mode, source_rst, target_rst, weather, start_time, end_time, confirm_status, comments, distance, duration)
+        values (#{user_id}, #{source_call_sign}, #{target_call_sign}, #{source_address}, #{source_district}, #{source_lng}, #{source_lat}, #{target_address}, #{target_lng}, #{target_lat}, #{source_device}, #{target_device}, #{source_antenna}, #{target_antenna}, #{source_power}, #{target_power}, #{frequency}, #{mode}, #{source_rst}, #{target_rst}, #{weather}, #{start_time}, #{end_time}, #{confirm_status}, #{comments},#{distance}, #{duration})
+    </insert>
+    <select id="selectCommunicationLogByUserIdAndOffetLimit" resultType="com.oft.fittools.po.CommunicationLog">
+        select *
+        from communication_log
+        where user_id = #{userId}
+        order by id desc
+        limit #{offset}, #{limit}
+    </select>
+</mapper>

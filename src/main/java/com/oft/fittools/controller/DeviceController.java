@@ -35,4 +35,9 @@ public class DeviceController {
         deviceService.setDefaultDevice(deviceId);
         return ResponseResult.success();
     }
+
+    @GetMapping("/default")
+    public ResponseResult setDefaultDevice() {
+        return ResponseResult.success(deviceService.getDefaultDevice());
+    }
 }

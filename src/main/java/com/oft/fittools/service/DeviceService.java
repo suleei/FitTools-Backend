@@ -14,4 +14,6 @@ public interface DeviceService {
     void deleteDevice(int id);
 
     void setDefaultDevice(int deviceId);
+
+    DeviceDTO getDefaultDevice();
 }
