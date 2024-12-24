@@ -7,8 +7,12 @@
         insert into communication_log(user_id, source_call_sign, target_call_sign, source_address, source_district, source_lng, source_lat, target_address, target_lng, target_lat, source_device, target_device, source_antenna, target_antenna, source_power, target_power, frequency, mode, source_rst, target_rst, weather, start_time, end_time, confirm_status, comments, distance, duration)
         values (#{user_id}, #{source_call_sign}, #{target_call_sign}, #{source_address}, #{source_district}, #{source_lng}, #{source_lat}, #{target_address}, #{target_lng}, #{target_lat}, #{source_device}, #{target_device}, #{source_antenna}, #{target_antenna}, #{source_power}, #{target_power}, #{frequency}, #{mode}, #{source_rst}, #{target_rst}, #{weather}, #{start_time}, #{end_time}, #{confirm_status}, #{comments},#{distance}, #{duration})
     </insert>
+    <delete id="delete">
+        delete from communication_log
+        where id=#{logId} and user_id = #{userId}
+    </delete>
     <select id="selectCommunicationLogByUserIdAndOffetLimit" resultType="com.oft.fittools.po.CommunicationLog">
-        select *
+        select id,start_time, target_call_sign, target_address, distance, confirm_status
         from communication_log
         where user_id = #{userId}
         order by id desc

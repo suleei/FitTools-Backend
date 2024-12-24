@@ -23,4 +23,10 @@ public class LogController {
     public ResponseResult getLogByPageNum(Integer pageNum) {
         return ResponseResult.success(communicationLogService.selectPage(pageNum));
     }
+
+    @DeleteMapping
+    public ResponseResult deleteLog(Integer logId){
+        communicationLogService.deleteLog(logId);
+        return ResponseResult.success();
+    }
 }

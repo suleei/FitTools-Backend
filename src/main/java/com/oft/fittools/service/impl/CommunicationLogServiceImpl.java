@@ -1,6 +1,7 @@
 package com.oft.fittools.service.impl;
 
 import com.oft.fittools.dto.log.CommunicationLogDTO;
+import com.oft.fittools.dto.log.CommunicationLogPageDTO;
 import com.oft.fittools.mapper.CommunicationLogMapper;
 import com.oft.fittools.mapper.UserMapper;
 import com.oft.fittools.po.CommunicationLog;
@@ -33,18 +34,24 @@ public class CommunicationLogServiceImpl implements CommunicationLogService {
     }
 
     @Override
-    public List<CommunicationLogDTO> selectPage(Integer page) {
+    public List<CommunicationLogPageDTO> selectPage(Integer page) {
         if(page == null) page=1;
         User user = userMapper.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
         int pageCount = 10;
         int offset = (page - 1) * pageCount;
         List<CommunicationLog> list = communicationLogMapper.selectCommunicationLogByUserIdAndOffetLimit(user.getId(),offset,pageCount);
-        List<CommunicationLogDTO> dtoList = new ArrayList<>();
+        List<CommunicationLogPageDTO> dtoList = new ArrayList<>();
         for(CommunicationLog log : list){
-            CommunicationLogDTO dto = new CommunicationLogDTO();
+            CommunicationLogPageDTO dto = new CommunicationLogPageDTO();
             BeanUtils.copyProperties(log,dto);
             dtoList.add(dto);
         }
         return dtoList;
+    }
+
+    @Override
+    public void deleteLog(Integer logId) {
+        User user = userMapper.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        communicationLogMapper.delete(logId, user.getId());
     }
 }
