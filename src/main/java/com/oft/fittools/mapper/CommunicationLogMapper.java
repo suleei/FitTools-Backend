@@ -12,4 +12,6 @@ public interface CommunicationLogMapper {
     public List<CommunicationLog> selectCommunicationLogByUserIdAndOffetLimit(Integer userId, int offset, int limit);
 
     public void delete(Integer logId, Integer userId);
+
+    public CommunicationLog getLogDetail(Integer logId, Integer userId);
 }

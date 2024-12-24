@@ -67,10 +67,10 @@ public class CommunicationLogDTO {
     @Size(max=100,message = "天气字符长度最长为100")
     String weather;
     @NotNull(message = "开始时间不能为空")
-    @JsonFormat(pattern = "yyyy-mm-dd hh:mm:ss", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     Date start_time;
     @NotNull(message = "结束时间不能为空")
-    @JsonFormat(pattern = "yyyy-mm-dd hh:mm:ss", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     Date end_time;
     String comments;
     Character confirm_status;

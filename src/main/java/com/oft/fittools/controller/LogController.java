@@ -29,4 +29,9 @@ public class LogController {
         communicationLogService.deleteLog(logId);
         return ResponseResult.success();
     }
+
+    @GetMapping("/detail")
+    public ResponseResult getLogDetail(Integer logId){
+        return ResponseResult.success(communicationLogService.getLogDetail(logId));
+    }
 }

@@ -18,4 +18,9 @@
         order by id desc
         limit #{offset}, #{limit}
     </select>
+    <select id="getLogDetail" resultType="com.oft.fittools.po.CommunicationLog">
+        select *
+        from communication_log
+        where id=#{logId} and user_id = #{userId}
+    </select>
 </mapper>

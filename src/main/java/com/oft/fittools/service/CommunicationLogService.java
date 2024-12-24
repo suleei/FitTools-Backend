@@ -11,4 +11,6 @@ public interface CommunicationLogService {
     public List<CommunicationLogPageDTO> selectPage(Integer page);
 
     void deleteLog(Integer logId);
+
+    Object getLogDetail(Integer logId);
 }

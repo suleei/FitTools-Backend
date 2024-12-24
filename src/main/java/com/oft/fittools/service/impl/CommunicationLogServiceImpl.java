@@ -37,7 +37,7 @@ public class CommunicationLogServiceImpl implements CommunicationLogService {
     public List<CommunicationLogPageDTO> selectPage(Integer page) {
         if(page == null) page=1;
         User user = userMapper.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
-        int pageCount = 10;
+        int pageCount = 20;
         int offset = (page - 1) * pageCount;
         List<CommunicationLog> list = communicationLogMapper.selectCommunicationLogByUserIdAndOffetLimit(user.getId(),offset,pageCount);
         List<CommunicationLogPageDTO> dtoList = new ArrayList<>();
@@ -53,5 +53,14 @@ public class CommunicationLogServiceImpl implements CommunicationLogService {
     public void deleteLog(Integer logId) {
         User user = userMapper.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
         communicationLogMapper.delete(logId, user.getId());
+    }
+
+    @Override
+    public CommunicationLogDTO getLogDetail(Integer logId) {
+        User user = userMapper.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        CommunicationLog log = communicationLogMapper.getLogDetail(logId, user.getId());
+        CommunicationLogDTO dto = new CommunicationLogDTO();
+        BeanUtils.copyProperties(log,dto);
+        return dto;
     }
 }
