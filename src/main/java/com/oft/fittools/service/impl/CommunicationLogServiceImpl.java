@@ -63,4 +63,52 @@ public class CommunicationLogServiceImpl implements CommunicationLogService {
         BeanUtils.copyProperties(log,dto);
         return dto;
     }
+
+    @Override
+    public List<CommunicationLogPageDTO> selectGuestPage(Integer pageNum) {
+        if(pageNum == null) pageNum=1;
+        User user = userMapper.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        int pageCount = 20;
+        int offset = (pageNum - 1) * pageCount;
+        List<CommunicationLog> list = communicationLogMapper.selectGuestCommunicationLogByUserIdAndOffetLimit(user.getCall_sign(),offset,pageCount);
+        List<CommunicationLogPageDTO> dtoList = new ArrayList<>();
+        for(CommunicationLog log : list){
+            CommunicationLogPageDTO dto = new CommunicationLogPageDTO();
+            dto.setId(log.getId());
+            dto.setStart_time(log.getStart_time());
+            dto.setTarget_call_sign(log.getSource_call_sign());
+            dto.setTarget_address(log.getSource_district());
+            dto.setDistance(log.getDistance());
+            dtoList.add(dto);
+        }
+        return dtoList;
+    }
+
+    @Override
+    public void acceptLog(Integer logId) {
+        setConfirmStatus(logId, 'Y');
+    }
+
+    @Override
+    public void rejectLog(Integer logId) {
+        setConfirmStatus(logId, 'X');
+    }
+
+    @Override
+    public CommunicationLogDTO getGuestLogDetail(Integer logId) {
+        User user = userMapper.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        CommunicationLog log = communicationLogMapper.getGuestLogDetail(logId, user.getCall_sign());
+        CommunicationLogDTO dto = new CommunicationLogDTO();
+        BeanUtils.copyProperties(log,dto);
+        dto.setSource_address("");
+        dto.setSource_lat(Math.floor(log.getSource_lat()));
+        dto.setSource_lng(Math.floor(log.getSource_lng()));
+        return dto;
+    }
+
+
+    public void setConfirmStatus(Integer logId, Character status) {
+        User user = userMapper.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        communicationLogMapper.setConfirmStatus(logId,user.getCall_sign(),status);
+    }
 }

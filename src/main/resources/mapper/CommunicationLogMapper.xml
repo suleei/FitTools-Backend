@@ -7,6 +7,11 @@
         insert into communication_log(user_id, source_call_sign, target_call_sign, source_address, source_district, source_lng, source_lat, target_address, target_lng, target_lat, source_device, target_device, source_antenna, target_antenna, source_power, target_power, frequency, mode, source_rst, target_rst, weather, start_time, end_time, confirm_status, comments, distance, duration)
         values (#{user_id}, #{source_call_sign}, #{target_call_sign}, #{source_address}, #{source_district}, #{source_lng}, #{source_lat}, #{target_address}, #{target_lng}, #{target_lat}, #{source_device}, #{target_device}, #{source_antenna}, #{target_antenna}, #{source_power}, #{target_power}, #{frequency}, #{mode}, #{source_rst}, #{target_rst}, #{weather}, #{start_time}, #{end_time}, #{confirm_status}, #{comments},#{distance}, #{duration})
     </insert>
+    <update id="setConfirmStatus">
+        update communication_log
+        set confirm_status = #{status}
+        where id = #{logId} and target_call_sign = #{targetCallSign}
+    </update>
     <delete id="delete">
         delete from communication_log
         where id=#{logId} and user_id = #{userId}
@@ -22,5 +27,18 @@
         select *
         from communication_log
         where id=#{logId} and user_id = #{userId}
+    </select>
+    <select id="selectGuestCommunicationLogByUserIdAndOffetLimit"
+            resultType="com.oft.fittools.po.CommunicationLog">
+        select id,start_time, source_call_sign, source_district, distance
+        from communication_log
+        where target_call_sign = #{targetCallSign} and confirm_status = 'N'
+        order by id desc
+            limit #{offset}, #{limit}
+    </select>
+    <select id="getGuestLogDetail" resultType="com.oft.fittools.po.CommunicationLog">
+        select *
+        from communication_log
+        where id=#{logId} and target_call_sign = #{targetCallSign}
     </select>
 </mapper>

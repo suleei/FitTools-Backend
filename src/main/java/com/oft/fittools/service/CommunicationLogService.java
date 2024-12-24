@@ -6,11 +6,19 @@ import com.oft.fittools.dto.log.CommunicationLogPageDTO;
 import java.util.List;
 
 public interface CommunicationLogService {
-    public void insert(CommunicationLogDTO communicationLog);
+    void insert(CommunicationLogDTO communicationLog);
 
-    public List<CommunicationLogPageDTO> selectPage(Integer page);
+    List<CommunicationLogPageDTO> selectPage(Integer page);
 
     void deleteLog(Integer logId);
 
-    Object getLogDetail(Integer logId);
+    CommunicationLogDTO getLogDetail(Integer logId);
+
+    List<CommunicationLogPageDTO> selectGuestPage(Integer pageNum);
+
+    void acceptLog(Integer logId);
+
+    void rejectLog(Integer logId);
+
+    CommunicationLogDTO getGuestLogDetail(Integer logId);
 }

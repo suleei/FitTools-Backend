@@ -14,4 +14,10 @@ public interface CommunicationLogMapper {
     public void delete(Integer logId, Integer userId);
 
     public CommunicationLog getLogDetail(Integer logId, Integer userId);
+
+    public CommunicationLog getGuestLogDetail(Integer logId, String targetCallSign);
+    public List<CommunicationLog> selectGuestCommunicationLogByUserIdAndOffetLimit(String targetCallSign, int offset, int limit);
+
+    public void setConfirmStatus(Integer logId, String targetCallSign, Character status);
+
 }
