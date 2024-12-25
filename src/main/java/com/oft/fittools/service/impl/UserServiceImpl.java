@@ -12,6 +12,7 @@ import com.oft.fittools.mapper.UserMapper;
 import com.oft.fittools.po.Location;
 import com.oft.fittools.po.User;
 import com.oft.fittools.security.UserDetailsServiceImpl;
+import com.oft.fittools.service.CallSignBloomFilterService;
 import com.oft.fittools.service.CaptchaService;
 import com.oft.fittools.service.MailSendingService;
 import com.oft.fittools.service.UserService;
@@ -46,6 +47,8 @@ public class UserServiceImpl implements UserService {
     private final CaptchaService  captchaService;
     private final MailSendingService mailSendingService;
     private final LocationMapper locationMapper;
+
+    private final CallSignBloomFilterService callSignBloomFilterService;
 
     @Override
     public void uploadAvatar(MultipartFile file) {
@@ -165,5 +168,6 @@ public class UserServiceImpl implements UserService {
     public void setCallSign(String callSign) {
         User user = userMapper.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
         userMapper.setCallSign(callSign, user.getId());
+        callSignBloomFilterService.add(callSign);
     }
 }

@@ -22,6 +22,8 @@ public interface CommunicationLogMapper {
 
     public void setConfirmStatus(Integer logId, String targetCallSign, Character status);
 
+    public void setConfirmStatusWarn(Integer logId, Character status);
+
     public List<CommunicationLog> selectMatchLog(String targetCallSign, Date startBegin, Date startEnd, Date endBegin, Date endEnd);
 
 }

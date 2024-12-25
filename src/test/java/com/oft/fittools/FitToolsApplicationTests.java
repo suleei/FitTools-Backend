@@ -2,6 +2,7 @@ package com.oft.fittools;
 
 import com.oft.fittools.mapper.LocationMapper;
 import com.oft.fittools.po.Location;
+import com.oft.fittools.service.CallSignBloomFilterService;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import io.minio.UploadObjectArgs;
@@ -22,5 +23,5 @@ import java.security.NoSuchAlgorithmException;
 @SpringBootTest
 class FitToolsApplicationTests {
     @Autowired
-    private LocationMapper locationMapper;
+    private CallSignBloomFilterService callSignBloomFilterService;
 }

@@ -6,12 +6,16 @@ import com.oft.fittools.mapper.CommunicationLogMapper;
 import com.oft.fittools.mapper.UserMapper;
 import com.oft.fittools.po.CommunicationLog;
 import com.oft.fittools.po.User;
+import com.oft.fittools.service.CallSignBloomFilterService;
 import com.oft.fittools.service.CommunicationLogService;
 import com.oft.fittools.service.LogConfirmNotifyService;
 import com.oft.fittools.service.UserService;
 import io.netty.util.concurrent.SingleThreadEventExecutor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -29,10 +33,16 @@ public class CommunicationLogServiceImpl implements CommunicationLogService {
     private final CommunicationLogMapper communicationLogMapper;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final LogConfirmNotifyService logConfirmNotifyService;
+    private final CallSignBloomFilterService callSignBloomFilterService;
+    private final RedisTemplate redisTemplate;
+    private final StringRedisTemplate stringRedisTemplate;
+
     @Override
     public void insert(CommunicationLogDTO communicationLog) {
         communicationLog.setDuration(communicationLog.getEnd_time().getTime() - communicationLog.getStart_time().getTime());
         if(communicationLog.getDuration()<=0) throw new RuntimeException("结束时间必须大于开始时间");
+        Date now = new Date();
+        if(now.getTime()<communicationLog.getEnd_time().getTime()) throw new RuntimeException("结束时间不能是未来某一时刻");
         User user = userMapper.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
         CommunicationLog log = new CommunicationLog();
         BeanUtils.copyProperties(communicationLog, log);
@@ -40,12 +50,37 @@ public class CommunicationLogServiceImpl implements CommunicationLogService {
         log.setUser_id(user.getId());
         communicationLogMapper.insert(log);
         executor.submit(() -> {
-            List<CommunicationLog> matchLogs = communicationLogMapper.selectMatchLog(log.getSource_call_sign(),new Date(log.getStart_time().getTime() - 600000),new Date(log.getStart_time().getTime() + 600000),new Date(log.getEnd_time().getTime() - 600000),new Date(log.getEnd_time().getTime() + 600000));
-            if(matchLogs.size()>0){
-                CommunicationLog firstLog = matchLogs.get(0);
-                communicationLogMapper.setConfirmStatus(firstLog.getId(), firstLog.getTarget_call_sign(), 'Y');
-                communicationLogMapper.setConfirmStatus(log.getId(), log.getTarget_call_sign(), 'Y');
-            }else logConfirmNotifyService.notify(log.getTarget_call_sign());
+            boolean match = false;
+            if(callSignBloomFilterService.contains(log.getTarget_call_sign())){
+                Date nowTime = new Date();
+                if(nowTime.getTime()-log.getStart_time().getTime() < 24*60*60*1000){
+                    String script = "if redis.call('exists', KEYS[1]) == 1 then local res = redis.call('get', KEYS[1]); redis.call('del', KEYS[1]); return res; elseif redis.call('exists', KEYS[2]) == 1 then local res = redis.call('get', KEYS[2]); redis.call('del', KEYS[2]); return res; elseif redis.call('exists', KEYS[3]) == 1 then local res = redis.call('get', KEYS[3]); redis.call('del', KEYS[3]); return res; else redis.call('set', KEYS[4], ARGV[1], 'EX', 60*60*25) end";
+                    DefaultRedisScript<String> redisScript = new DefaultRedisScript<>(script, String.class);
+                    String serachPair = communicationLog.getTarget_call_sign() + ">" + communicationLog.getSource_call_sign();
+                    String setPair = communicationLog.getSource_call_sign() + ">" + communicationLog.getTarget_call_sign();
+                    Long logSeconds = log.getStart_time().getTime() / 60000;
+                    List<String> keys = new ArrayList<>();
+                    keys.add(serachPair+ ">" + (logSeconds - 1));
+                    keys.add(serachPair+ ">" + logSeconds);
+                    keys.add(serachPair+ ">" + (logSeconds + 1));
+                    keys.add(setPair+ ">" + logSeconds);
+                    String matchLogId = stringRedisTemplate.execute(redisScript, keys,String.valueOf(log.getId()));
+                    if(matchLogId!=null) {
+                        communicationLogMapper.setConfirmStatusWarn(Integer.valueOf(matchLogId), 'Y');
+                        communicationLogMapper.setConfirmStatusWarn(log.getId(), 'Y');
+                        match = true;
+                    }
+                }else{
+                    List<CommunicationLog> matchLogs = communicationLogMapper.selectMatchLog(log.getSource_call_sign(),new Date(log.getStart_time().getTime() - 600000),new Date(log.getStart_time().getTime() + 600000),new Date(log.getEnd_time().getTime() - 600000),new Date(log.getEnd_time().getTime() + 600000));
+                    if(matchLogs.size()>0) {
+                        CommunicationLog firstLog = matchLogs.get(0);
+                        communicationLogMapper.setConfirmStatusWarn(firstLog.getId(), 'Y');
+                        communicationLogMapper.setConfirmStatusWarn(log.getId(), 'Y');
+                        match = true;
+                    }
+                }
+            }
+            if(!match) logConfirmNotifyService.notify(log.getTarget_call_sign());
         });
     }
 

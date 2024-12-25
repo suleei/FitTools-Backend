@@ -12,6 +12,11 @@
         set confirm_status = #{status}
         where id = #{logId} and target_call_sign = #{targetCallSign}
     </update>
+    <update id="setConfirmStatusWarn">
+        update communication_log
+        set confirm_status = #{status}
+        where id = #{logId}
+    </update>
     <delete id="delete">
         delete from communication_log
         where id=#{logId} and user_id = #{userId}
