@@ -16,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
@@ -39,7 +40,12 @@ public class CommunicationLogServiceImpl implements CommunicationLogService {
         log.setUser_id(user.getId());
         communicationLogMapper.insert(log);
         executor.submit(() -> {
-            logConfirmNotifyService.notify(log.getTarget_call_sign());
+            List<CommunicationLog> matchLogs = communicationLogMapper.selectMatchLog(log.getSource_call_sign(),new Date(log.getStart_time().getTime() - 600000),new Date(log.getStart_time().getTime() + 600000),new Date(log.getEnd_time().getTime() - 600000),new Date(log.getEnd_time().getTime() + 600000));
+            if(matchLogs.size()>0){
+                CommunicationLog firstLog = matchLogs.get(0);
+                communicationLogMapper.setConfirmStatus(firstLog.getId(), firstLog.getTarget_call_sign(), 'Y');
+                communicationLogMapper.setConfirmStatus(log.getId(), log.getTarget_call_sign(), 'Y');
+            }else logConfirmNotifyService.notify(log.getTarget_call_sign());
         });
     }
 
