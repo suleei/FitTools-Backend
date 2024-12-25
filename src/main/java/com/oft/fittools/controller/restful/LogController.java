@@ -1,11 +1,10 @@
-package com.oft.fittools.controller;
+package com.oft.fittools.controller.restful;
 
 import com.oft.fittools.dto.log.CommunicationLogDTO;
 import com.oft.fittools.global.ResponseResult;
 import com.oft.fittools.service.CommunicationLogService;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 

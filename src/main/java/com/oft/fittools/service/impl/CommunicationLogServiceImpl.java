@@ -7,6 +7,9 @@ import com.oft.fittools.mapper.UserMapper;
 import com.oft.fittools.po.CommunicationLog;
 import com.oft.fittools.po.User;
 import com.oft.fittools.service.CommunicationLogService;
+import com.oft.fittools.service.LogConfirmNotifyService;
+import com.oft.fittools.service.UserService;
+import io.netty.util.concurrent.SingleThreadEventExecutor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,13 +17,17 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Service
 @RequiredArgsConstructor
 public class CommunicationLogServiceImpl implements CommunicationLogService {
     private final UserMapper userMapper;
     private final CommunicationLogMapper communicationLogMapper;
-
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final LogConfirmNotifyService logConfirmNotifyService;
     @Override
     public void insert(CommunicationLogDTO communicationLog) {
         communicationLog.setDuration(communicationLog.getEnd_time().getTime() - communicationLog.getStart_time().getTime());
@@ -31,6 +38,9 @@ public class CommunicationLogServiceImpl implements CommunicationLogService {
         log.setConfirm_status('N');
         log.setUser_id(user.getId());
         communicationLogMapper.insert(log);
+        executor.submit(() -> {
+            logConfirmNotifyService.notify(log.getTarget_call_sign());
+        });
     }
 
     @Override

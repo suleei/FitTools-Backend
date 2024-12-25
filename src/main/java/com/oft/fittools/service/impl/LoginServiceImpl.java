@@ -26,7 +26,6 @@ import java.util.concurrent.*;
 @Service
 @RequiredArgsConstructor
 public class LoginServiceImpl implements LoginService {
-    private final StringRedisTemplate stringRedisTemplate;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
     private final MailSendingService mailSendingService;

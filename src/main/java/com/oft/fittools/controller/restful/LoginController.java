@@ -1,4 +1,4 @@
-package com.oft.fittools.controller;
+package com.oft.fittools.controller.restful;
 
 import com.oft.fittools.dto.login.*;
 import com.oft.fittools.global.ResponseResult;
