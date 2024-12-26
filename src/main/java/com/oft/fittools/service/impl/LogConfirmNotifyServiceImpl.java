@@ -1,6 +1,7 @@
 package com.oft.fittools.service.impl;
 
 import com.oft.fittools.controller.websocket.LogConfirmNotifyingSocketServer;
+import com.oft.fittools.global.UserContextHolder;
 import com.oft.fittools.mapper.UserMapper;
 import com.oft.fittools.po.User;
 import com.oft.fittools.service.LogConfirmNotifyService;
@@ -30,7 +31,7 @@ public class LogConfirmNotifyServiceImpl implements LogConfirmNotifyService {
 
     @Override
     public String getConfirmLog() {
-        User user = userMapper.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        User user = UserContextHolder.getUser();
         if(stringRedisTemplate.hasKey(prefix+user.getCall_sign())){
             return stringRedisTemplate.opsForValue().get(prefix+user.getCall_sign());
         }
@@ -39,7 +40,7 @@ public class LogConfirmNotifyServiceImpl implements LogConfirmNotifyService {
 
     @Override
     public void deleteConfirmLog() {
-        User user = userMapper.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        User user = UserContextHolder.getUser();
         stringRedisTemplate.delete(prefix+user.getCall_sign());
     }
 }

@@ -2,6 +2,7 @@ package com.oft.fittools.service.impl;
 
 import com.oft.fittools.dto.log.CommunicationLogDTO;
 import com.oft.fittools.dto.log.CommunicationLogPageDTO;
+import com.oft.fittools.global.UserContextHolder;
 import com.oft.fittools.mapper.CommunicationLogMapper;
 import com.oft.fittools.mapper.UserMapper;
 import com.oft.fittools.po.CommunicationLog;
@@ -43,7 +44,7 @@ public class CommunicationLogServiceImpl implements CommunicationLogService {
         if(communicationLog.getDuration()<=0) throw new RuntimeException("结束时间必须大于开始时间");
         Date now = new Date();
         if(now.getTime()<communicationLog.getEnd_time().getTime()) throw new RuntimeException("结束时间不能是未来某一时刻");
-        User user = userMapper.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        User user = UserContextHolder.getUser();
         CommunicationLog log = new CommunicationLog();
         BeanUtils.copyProperties(communicationLog, log);
         log.setConfirm_status('N');
@@ -87,7 +88,7 @@ public class CommunicationLogServiceImpl implements CommunicationLogService {
     @Override
     public List<CommunicationLogPageDTO> selectPage(Integer page) {
         if(page == null) page=1;
-        User user = userMapper.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        User user = UserContextHolder.getUser();
         int pageCount = 20;
         int offset = (page - 1) * pageCount;
         List<CommunicationLog> list = communicationLogMapper.selectCommunicationLogByUserIdAndOffetLimit(user.getId(),offset,pageCount);
@@ -102,13 +103,13 @@ public class CommunicationLogServiceImpl implements CommunicationLogService {
 
     @Override
     public void deleteLog(Integer logId) {
-        User user = userMapper.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        User user = UserContextHolder.getUser();
         communicationLogMapper.delete(logId, user.getId());
     }
 
     @Override
     public CommunicationLogDTO getLogDetail(Integer logId) {
-        User user = userMapper.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        User user = UserContextHolder.getUser();
         CommunicationLog log = communicationLogMapper.getLogDetail(logId, user.getId());
         CommunicationLogDTO dto = new CommunicationLogDTO();
         BeanUtils.copyProperties(log,dto);
@@ -118,7 +119,7 @@ public class CommunicationLogServiceImpl implements CommunicationLogService {
     @Override
     public List<CommunicationLogPageDTO> selectGuestPage(Integer pageNum) {
         if(pageNum == null) pageNum=1;
-        User user = userMapper.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        User user = UserContextHolder.getUser();
         int pageCount = 20;
         int offset = (pageNum - 1) * pageCount;
         List<CommunicationLog> list = communicationLogMapper.selectGuestCommunicationLogByUserIdAndOffetLimit(user.getCall_sign(),offset,pageCount);
@@ -147,7 +148,7 @@ public class CommunicationLogServiceImpl implements CommunicationLogService {
 
     @Override
     public CommunicationLogDTO getGuestLogDetail(Integer logId) {
-        User user = userMapper.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        User user = UserContextHolder.getUser();
         CommunicationLog log = communicationLogMapper.getGuestLogDetail(logId, user.getCall_sign());
         CommunicationLogDTO dto = new CommunicationLogDTO();
         BeanUtils.copyProperties(log,dto);
@@ -159,7 +160,7 @@ public class CommunicationLogServiceImpl implements CommunicationLogService {
 
 
     public void setConfirmStatus(Integer logId, Character status) {
-        User user = userMapper.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        User user = UserContextHolder.getUser();
         communicationLogMapper.setConfirmStatus(logId,user.getCall_sign(),status);
     }
 }

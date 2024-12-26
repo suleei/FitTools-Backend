@@ -3,6 +3,7 @@ package com.oft.fittools.service.impl;
 import com.oft.fittools.dto.device.AddDeviceReqDTO;
 import com.oft.fittools.dto.device.DeviceDTO;
 import com.oft.fittools.dto.device.GetDevicesRespDTO;
+import com.oft.fittools.global.UserContextHolder;
 import com.oft.fittools.mapper.DeviceMapper;
 import com.oft.fittools.mapper.UserMapper;
 import com.oft.fittools.po.Device;
@@ -27,7 +28,7 @@ public class DeviceServiceImpl implements DeviceService {
 
     @Override
     public void insert(AddDeviceReqDTO addDeviceReqDTO) {
-        User user = userMapper.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        User user = UserContextHolder.getUser();
         Device device = new Device();
         device.setUser_id(user.getId());
         BeanUtils.copyProperties(addDeviceReqDTO, device);
@@ -36,7 +37,7 @@ public class DeviceServiceImpl implements DeviceService {
 
     @Override
     public GetDevicesRespDTO getDevices() {
-        User user=userMapper.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        User user=UserContextHolder.getUser();
         List<Device> devices = deviceMapper.getDeviceByUserId(user.getId());
         GetDevicesRespDTO getDevicesRespDTO = new GetDevicesRespDTO();
         List<DeviceDTO> list = new ArrayList<>();
@@ -52,13 +53,13 @@ public class DeviceServiceImpl implements DeviceService {
 
     @Override
     public void deleteDevice(int id) {
-        User user=userMapper.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        User user=UserContextHolder.getUser();
         deviceMapper.delete(id, user.getId());
     }
 
     @Override
     public void setDefaultDevice(int deviceId) {
-        User user=userMapper.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        User user=UserContextHolder.getUser();
         if(deviceMapper.getDeviceByIdAndUserId(deviceId,user.getId())==null) throw new RuntimeException("您不拥有该设备");
         if(user.getDevice_id()!=null&&user.getDevice_id()==deviceId) userMapper.setDevice(null, user.getId());
         else userMapper.setDevice(deviceId, user.getId());
@@ -66,7 +67,7 @@ public class DeviceServiceImpl implements DeviceService {
 
     @Override
     public DeviceDTO getDefaultDevice() {
-        User user=userMapper.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        User user= UserContextHolder.getUser();
         DeviceDTO deviceDTO = new DeviceDTO();
         if(user.getDevice_id()==null) return deviceDTO;
         Device device = deviceMapper.getDeviceByIdAndUserId(user.getDevice_id(),user.getId());

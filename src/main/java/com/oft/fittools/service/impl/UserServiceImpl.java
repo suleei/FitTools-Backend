@@ -7,6 +7,7 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.oft.fittools.dto.user.*;
+import com.oft.fittools.global.UserContextHolder;
 import com.oft.fittools.mapper.LocationMapper;
 import com.oft.fittools.mapper.UserMapper;
 import com.oft.fittools.po.Location;
@@ -68,7 +69,7 @@ public class UserServiceImpl implements UserService {
         }catch (Exception e){
             throw new RuntimeException(e.getMessage());
         }
-        User user = userMapper.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        User user = UserContextHolder.getUser();
         userMapper.updateAvatar(SecurityContextHolder.getContext().getAuthentication().getName(), sb.toString());
         if(user.getAvatar()!=null){
             try {
@@ -87,7 +88,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public GetUserInfoRespDTO getUserInfo() {
-        User user = userMapper.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        User user = UserContextHolder.getUser();
         GetUserInfoRespDTO dto = new GetUserInfoRespDTO();
         BeanUtils.copyProperties(user,dto);
         String avatarURL = endpoint + "/avatar/";
@@ -110,13 +111,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public void sendEmailCaptcha(EmailSendingReqDTO emailSendingReqDTO) {
         captchaService.verifyCaptcha(emailSendingReqDTO.getCaptchaHash(), emailSendingReqDTO.getCaptchaCode());
-        User user = userMapper.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        User user = UserContextHolder.getUser();
         mailSendingService.sendCaptcha(user.getEmail(),"修改邮箱");
     }
 
     @Override
     public String verify(String captcha) {
-        User user = userMapper.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        User user = UserContextHolder.getUser();
         if(!mailSendingService.verifyCaptcha(user.getEmail(),captcha)) throw new RuntimeException("邮箱验证码错误");
         Calendar expireTime = Calendar.getInstance();
         expireTime.add(Calendar.MINUTE,5);
@@ -133,7 +134,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void modifyEmail(EmailModificationReqDTO emailModificationReqDTO) {
         if(!mailSendingService.verifyCaptcha(emailModificationReqDTO.getEmail(), emailModificationReqDTO.getCaptcha())) throw new RuntimeException("新邮箱验证码错误");
-        User user = userMapper.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        User user = UserContextHolder.getUser();
         JWTVerifier jwtVerifier= JWT.require(Algorithm.HMAC256(signatureKey)).build();
         DecodedJWT decodedJWT =  jwtVerifier.verify(emailModificationReqDTO.getJwt());
         if(!user.getUsername().equals(decodedJWT.getClaim("username").asString())) throw new RuntimeException("授权用户名不一致");
@@ -144,7 +145,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void updateAddress(AddressDTO addressDTO) {
-        User user = userMapper.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        User user = UserContextHolder.getUser();
         Location location = new Location();
         BeanUtils.copyProperties(addressDTO,location);
         locationMapper.insert(location);
@@ -156,7 +157,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public AddressDTO getAddress() {
-        User user = userMapper.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        User user = UserContextHolder.getUser();
         if(user.getLocation_id()==null) return new AddressDTO("未设置","未设置","未设置");
         Location location = locationMapper.select(user.getLocation_id());
         AddressDTO addressDTO = new AddressDTO();
@@ -166,7 +167,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void setCallSign(String callSign) {
-        User user = userMapper.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        User user = UserContextHolder.getUser();
         userMapper.setCallSign(callSign, user.getId());
         callSignBloomFilterService.add(callSign);
     }

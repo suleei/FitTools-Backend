@@ -4,7 +4,9 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.oft.fittools.global.UserContextHolder;
 import com.oft.fittools.mapper.UserMapper;
+import com.oft.fittools.po.User;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -50,12 +52,14 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
             handlerExceptionResolver.resolveException(request,response,null,e);
             return;
         }
-        if(userMapper.getUserByUsername(username)==null){
+        User user = userMapper.getUserByUsername(username);
+        if(user==null){
             handlerExceptionResolver.resolveException(request,response,null,new UsernameNotFoundException("Username not found"));
             return;
         }
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken= new UsernamePasswordAuthenticationToken(username,null,null);
         SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+        UserContextHolder.setUser(user);
         filterChain.doFilter(request,response);
     }
 }
