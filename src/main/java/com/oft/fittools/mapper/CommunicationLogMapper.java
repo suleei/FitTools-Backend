@@ -10,7 +10,7 @@ import java.util.List;
 public interface CommunicationLogMapper {
     public Integer insert(CommunicationLog communicationLog);
 
-    public List<CommunicationLog> selectCommunicationLogByUserIdAndOffetLimit(Integer userId, int offset, int limit);
+    public List<CommunicationLog> selectCommunicationLogByUserIdAndOffsetLimit(Integer userId, int offset, int limit);
 
     public void delete(Integer logId, Integer userId);
 
@@ -18,7 +18,7 @@ public interface CommunicationLogMapper {
 
     public CommunicationLog getGuestLogDetail(Integer logId, String targetCallSign);
 
-    public List<CommunicationLog> selectGuestCommunicationLogByUserIdAndOffetLimit(String targetCallSign, int offset, int limit);
+    public List<CommunicationLog> selectGuestCommunicationLogByUserIdAndOffsetLimit(String targetCallSign, int offset, int limit);
 
     public void setConfirmStatus(Integer logId, String targetCallSign, Character status);
 

@@ -10,20 +10,16 @@ import com.oft.fittools.po.User;
 import com.oft.fittools.service.CallSignBloomFilterService;
 import com.oft.fittools.service.CommunicationLogService;
 import com.oft.fittools.service.LogConfirmNotifyService;
-import com.oft.fittools.service.UserService;
-import io.netty.util.concurrent.SingleThreadEventExecutor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -91,7 +87,7 @@ public class CommunicationLogServiceImpl implements CommunicationLogService {
         User user = UserContextHolder.getUser();
         int pageCount = 20;
         int offset = (page - 1) * pageCount;
-        List<CommunicationLog> list = communicationLogMapper.selectCommunicationLogByUserIdAndOffetLimit(user.getId(),offset,pageCount);
+        List<CommunicationLog> list = communicationLogMapper.selectCommunicationLogByUserIdAndOffsetLimit(user.getId(),offset,pageCount);
         List<CommunicationLogPageDTO> dtoList = new ArrayList<>();
         for(CommunicationLog log : list){
             CommunicationLogPageDTO dto = new CommunicationLogPageDTO();
@@ -122,7 +118,7 @@ public class CommunicationLogServiceImpl implements CommunicationLogService {
         User user = UserContextHolder.getUser();
         int pageCount = 20;
         int offset = (pageNum - 1) * pageCount;
-        List<CommunicationLog> list = communicationLogMapper.selectGuestCommunicationLogByUserIdAndOffetLimit(user.getCall_sign(),offset,pageCount);
+        List<CommunicationLog> list = communicationLogMapper.selectGuestCommunicationLogByUserIdAndOffsetLimit(user.getCall_sign(),offset,pageCount);
         List<CommunicationLogPageDTO> dtoList = new ArrayList<>();
         for(CommunicationLog log : list){
             CommunicationLogPageDTO dto = new CommunicationLogPageDTO();

@@ -13,10 +13,7 @@ import com.oft.fittools.mapper.UserMapper;
 import com.oft.fittools.po.Location;
 import com.oft.fittools.po.User;
 import com.oft.fittools.security.UserDetailsServiceImpl;
-import com.oft.fittools.service.CallSignBloomFilterService;
-import com.oft.fittools.service.CaptchaService;
-import com.oft.fittools.service.MailSendingService;
-import com.oft.fittools.service.UserService;
+import com.oft.fittools.service.*;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import io.minio.RemoveObjectArgs;
@@ -37,6 +34,7 @@ public class UserServiceImpl implements UserService {
     private final MinioClient minioClient;
     private final UserMapper userMapper;
     private final UserDetailsServiceImpl userDetailsServiceImpl;
+    private final NearByHamServiceImpl nearByHamServiceImpl;
     private Snowflake snowflake = IdUtil.createSnowflake(1,1);
 
     @Value("${minio.endpoint}")
@@ -50,6 +48,7 @@ public class UserServiceImpl implements UserService {
     private final LocationMapper locationMapper;
 
     private final CallSignBloomFilterService callSignBloomFilterService;
+    private final NearByHamService nearByHamService;
 
     @Override
     public void uploadAvatar(MultipartFile file) {
@@ -153,6 +152,8 @@ public class UserServiceImpl implements UserService {
         if(user.getLocation_id()!=null){
             locationMapper.delete(user.getLocation_id());
         }
+        user.setLocation_id(location.getId());
+        if(nearByHamService.getActiveStatus()) nearByHamService.setStatusActive();
     }
 
     @Override
@@ -168,6 +169,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void setCallSign(String callSign) {
         User user = UserContextHolder.getUser();
+        if(user.getCall_sign()!=null) nearByHamService.setStatusInactive();
         userMapper.setCallSign(callSign, user.getId());
         callSignBloomFilterService.add(callSign);
     }

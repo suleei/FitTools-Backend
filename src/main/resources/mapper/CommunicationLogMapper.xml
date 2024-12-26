@@ -21,7 +21,7 @@
         delete from communication_log
         where id=#{logId} and user_id = #{userId}
     </delete>
-    <select id="selectCommunicationLogByUserIdAndOffetLimit" resultType="com.oft.fittools.po.CommunicationLog">
+    <select id="selectCommunicationLogByUserIdAndOffsetLimit" resultType="com.oft.fittools.po.CommunicationLog">
         select id,start_time, target_call_sign, target_address, distance, confirm_status
         from communication_log
         where user_id = #{userId}
@@ -33,7 +33,7 @@
         from communication_log
         where id=#{logId} and user_id = #{userId}
     </select>
-    <select id="selectGuestCommunicationLogByUserIdAndOffetLimit"
+    <select id="selectGuestCommunicationLogByUserIdAndOffsetLimit"
             resultType="com.oft.fittools.po.CommunicationLog">
         select id,start_time, source_call_sign, source_district, distance
         from communication_log

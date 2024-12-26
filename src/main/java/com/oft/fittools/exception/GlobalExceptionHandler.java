@@ -25,6 +25,12 @@ public class GlobalExceptionHandler {
         return ResponseResult.fail("插入的字段违反唯一约束");
     }
 
+    @ExceptionHandler(value = HandlerMethodValidationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseResult handlerMethodValidationExceptionHandler(HandlerMethodValidationException ex) {
+        return  ResponseResult.fail(ex.getAllValidationResults().get(0).getResolvableErrors().get(0).getDefaultMessage());
+    }
+
     @ExceptionHandler(value = Exception.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public  ResponseResult exceptionHandler(Exception e){
