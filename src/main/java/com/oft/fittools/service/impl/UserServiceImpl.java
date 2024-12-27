@@ -153,7 +153,7 @@ public class UserServiceImpl implements UserService {
             locationMapper.delete(user.getLocation_id());
         }
         user.setLocation_id(location.getId());
-        if(nearByHamService.getActiveStatus()) nearByHamService.setStatusActive();
+        if(nearByHamService.getActiveStatus()) nearByHamService.updateAddress();
     }
 
     @Override

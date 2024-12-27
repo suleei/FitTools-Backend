@@ -1,6 +1,7 @@
 package com.oft.fittools.service;
 
 import com.oft.fittools.dto.ham.NearByHamDTO;
+import com.oft.fittools.dto.ham.SetStatusActiveReqDTo;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -11,7 +12,11 @@ public interface NearByHamService {
 
     boolean getActiveStatus();
 
-    void setStatusActive();
+    Integer[] getActiveTime();
+
+    void setStatusActive(SetStatusActiveReqDTo setStatusActiveReqDTo);
+
+    void updateAddress();
 
     void setStatusInactive();
 
