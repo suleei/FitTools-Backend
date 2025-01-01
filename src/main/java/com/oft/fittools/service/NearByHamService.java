@@ -21,4 +21,6 @@ public interface NearByHamService {
     void setStatusInactive();
 
     List<NearByHamDTO> getNearByHam(@NotNull(message = "距离不能为空") @Min(value = 5, message = "最小为五公里") @Max(value = 6000, message = "最大为六千公里") Integer distance);
+
+    void updateActiveTime(SetStatusActiveReqDTo setStatusActiveReqDTo);
 }

@@ -10,4 +10,5 @@ public class NearByHamDTO {
     String lat;
     String distance;
     String call_sign;
+    Integer[] active_time;
 }

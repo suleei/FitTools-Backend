@@ -93,9 +93,26 @@ public class NearByHamServiceImpl implements NearByHamService {
             RedisGeoCommands.GeoLocation<String> loc = location.getContent();
             String dstTime = stringRedisTemplate.opsForValue().get(prefix+"time:"+loc.getName());
             if(!timeMatch(srcTime,dstTime)) continue;
-            result.add(new NearByHamDTO(String.format("%.6f",loc.getPoint().getX()),String.format("%.6f",loc.getPoint().getY()),String.format("%.3f",location.getDistance().getValue()/1000),loc.getName()));
+            Integer[] active_time =  timeDecoder(stringRedisTemplate.opsForValue().get(prefix+"time:"+loc.getName()));
+            System.out.println();
+            result.add(new NearByHamDTO(String.format("%.6f",loc.getPoint().getX()),String.format("%.6f",loc.getPoint().getY()),String.format("%.3f",location.getDistance().getValue()/1000),loc.getName(),active_time));
         }
         return result;
+    }
+
+    @Override
+    public void updateActiveTime(SetStatusActiveReqDTo setStatusActiveReqDTo) {
+        boolean active = false;
+        for(Integer i:setStatusActiveReqDTo.getTimes()) {
+            if(i!=0) {
+                active = true;
+                break;
+            }
+        }
+        if(!active) throw new RuntimeException("活跃时间段不能都为空");
+        User user = UserContextHolder.getUser();
+        if(!getActiveStatus()) throw new RuntimeException("附近功能未激活");
+        stringRedisTemplate.opsForValue().set(prefix+"time:"+user.getCall_sign(),times2string(setStatusActiveReqDTo.getTimes()));
     }
 
     private static String times2string(Integer[] times){
@@ -133,9 +150,9 @@ public class NearByHamServiceImpl implements NearByHamService {
         int byte_index = 0;
         int bit_index = 0;
         for(int i=0;i<7;i++){
-            int num = times[i];
+            times[i] = 0;
             for(int j=0;j<24;j++){
-                if((bytes[byte_index] & (1<<bit_index))==1){
+                if((bytes[byte_index] & (1<<bit_index))==(1<<bit_index)){
                     times[i] = times[i] | (1 << j);
                 }
                 bit_index++;

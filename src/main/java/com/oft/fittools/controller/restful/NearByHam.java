@@ -37,8 +37,14 @@ public class NearByHam {
         return ResponseResult.success(nearByHamService.getNearByHam(distance));
     }
 
-    @GetMapping
+    @GetMapping("/time")
     public ResponseResult getActiveTime(){
         return ResponseResult.success(nearByHamService.getActiveTime());
+    }
+
+    @PostMapping("/time")
+    public ResponseResult getActiveTime(@RequestBody SetStatusActiveReqDTo setStatusActiveReqDTo){
+        nearByHamService.updateActiveTime(setStatusActiveReqDTo);
+        return ResponseResult.success();
     }
 }
