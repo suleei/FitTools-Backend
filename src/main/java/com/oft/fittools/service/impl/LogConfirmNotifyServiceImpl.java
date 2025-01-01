@@ -1,13 +1,13 @@
 package com.oft.fittools.service.impl;
 
-import com.oft.fittools.controller.websocket.LogConfirmNotifyingSocketServer;
+import com.oft.fittools.controller.websocket.SocketServer;
+import com.oft.fittools.global.SocketInfo;
 import com.oft.fittools.global.UserContextHolder;
 import com.oft.fittools.mapper.UserMapper;
 import com.oft.fittools.po.User;
 import com.oft.fittools.service.LogConfirmNotifyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -24,8 +24,9 @@ public class LogConfirmNotifyServiceImpl implements LogConfirmNotifyService {
     public void notify(String call_sign) {
         Long logCount = stringRedisTemplate.opsForValue().increment(prefix+call_sign, 1);
         try {
-            LogConfirmNotifyingSocketServer.sendInfo(String.valueOf(logCount), call_sign);
+            SocketServer.sendInfo(SocketInfo.newConfirmMessageNum(logCount), call_sign);
         } catch (IOException e) {
+            System.out.println(e.getMessage());
         }
     }
 
