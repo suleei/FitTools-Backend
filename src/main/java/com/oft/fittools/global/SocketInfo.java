@@ -3,7 +3,7 @@ package com.oft.fittools.global;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.oft.fittools.dto.chat.MessageDTO;
+import com.oft.fittools.dto.chat.ChatMessageDTO;
 import lombok.Data;
 
 @Data
@@ -26,10 +26,10 @@ public class SocketInfo {
         return objectMapper.writeValueAsString(socketInfo);
     }
 
-    public static String newChatMessage(MessageDTO messageDTO) throws JsonProcessingException{
+    public static String newChatMessage(ChatMessageDTO chatMessageDTO) throws JsonProcessingException{
         SocketInfo socketInfo = new SocketInfo();
         socketInfo.type = InfoType.CHAT_MESSAGE;
-        socketInfo.formattedMessage =   objectMapper.writeValueAsString(messageDTO);
+        socketInfo.formattedMessage =   objectMapper.writeValueAsString(chatMessageDTO);
         return objectMapper.writeValueAsString(socketInfo);
     }
 

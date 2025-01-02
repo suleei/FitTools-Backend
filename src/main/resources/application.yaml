@@ -19,3 +19,11 @@ minio:
   endpoint: http://127.0.0.1:9000
   accessKey: ZxnBGusK8kSBMbfqan1b
   secretKey: rzAYlE1Bh3DRxLSJTqpujiaJTO5m7vPRZIOb9Rjt
+
+rocketmq:
+  name-server: common-rocketmq-dev.magestack.cn:9876
+  producer:
+    group: fittools
+    send-message-timeout: 2000
+    retry-times-when-send-failed: 1
+    retry-times-when-send-async-failed: 1
