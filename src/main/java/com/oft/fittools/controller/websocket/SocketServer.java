@@ -132,7 +132,10 @@ public class SocketServer {
                     if(pre_target!=null && webSocketMap.containsKey(pre_target)) {
                         webSocketMap.get(pre_target).getCommunicators().remove(this.call_sign);
                     }
-                    if(jsonObject.getStr("active_target").equals("CLOSE_CHAT")) return;
+                    if(jsonObject.getStr("active_target").equals("CLOSE_CHAT")) {
+                        this.active_target = null;
+                        return;
+                    }
                     this.active_target = jsonObject.getStr("active_target");
                     if(webSocketMap.containsKey(this.active_target)) {
                         webSocketMap.get(this.active_target).getCommunicators().add(this.call_sign);
@@ -152,8 +155,8 @@ public class SocketServer {
     }
 
     public static void sendMessage(String message, String call_sign, String dst_call_sign) throws IOException {
-        if(StringUtils.isNotBlank(call_sign)&&webSocketMap.containsKey(call_sign)&&webSocketMap.get(call_sign).getActive_target().equals(dst_call_sign)) {
-            webSocketMap.get(call_sign).sendMessage(message);
+        if(StringUtils.isNotBlank(dst_call_sign)&&webSocketMap.containsKey(dst_call_sign)&&call_sign.equals(webSocketMap.get(dst_call_sign).getActive_target())) {
+            webSocketMap.get(dst_call_sign).sendMessage(message);
         }
     }
 

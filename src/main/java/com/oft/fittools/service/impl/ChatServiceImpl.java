@@ -20,7 +20,7 @@ import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
-public class CharServiceImpl implements ChatService {
+public class ChatServiceImpl implements ChatService {
     private final StringRedisTemplate stringRedisTemplate;
     private final RocketMQTemplate rocketMQTemplate;
     private static final String prefix = "chat:";

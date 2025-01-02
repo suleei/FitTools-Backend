@@ -1,6 +1,7 @@
 package com.oft.fittools.global;
 
 
+import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.oft.fittools.dto.chat.ChatMessageDTO;
@@ -29,8 +30,8 @@ public class SocketInfo {
     public static String newChatMessage(ChatMessageDTO chatMessageDTO) throws JsonProcessingException{
         SocketInfo socketInfo = new SocketInfo();
         socketInfo.type = InfoType.CHAT_MESSAGE;
-        socketInfo.formattedMessage =   objectMapper.writeValueAsString(chatMessageDTO);
-        return objectMapper.writeValueAsString(socketInfo);
+        socketInfo.formattedMessage = JSON.toJSONString(chatMessageDTO);
+        return JSON.toJSONString(socketInfo);
     }
 
     public static String newTargetOnlineStatus(Boolean status) throws JsonProcessingException{
