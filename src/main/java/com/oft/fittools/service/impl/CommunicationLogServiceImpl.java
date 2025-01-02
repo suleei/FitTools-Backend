@@ -33,6 +33,7 @@ public class CommunicationLogServiceImpl implements CommunicationLogService {
     private final CallSignBloomFilterService callSignBloomFilterService;
     private final RedisTemplate redisTemplate;
     private final StringRedisTemplate stringRedisTemplate;
+    private static final String prefix = "log_match:";
 
     @Override
     public void insert(CommunicationLogDTO communicationLog) {
@@ -57,10 +58,10 @@ public class CommunicationLogServiceImpl implements CommunicationLogService {
                     String setPair = communicationLog.getSource_call_sign() + ">" + communicationLog.getTarget_call_sign();
                     Long logSeconds = log.getStart_time().getTime() / 60000;
                     List<String> keys = new ArrayList<>();
-                    keys.add(serachPair+ ">" + (logSeconds - 1));
-                    keys.add(serachPair+ ">" + logSeconds);
-                    keys.add(serachPair+ ">" + (logSeconds + 1));
-                    keys.add(setPair+ ">" + logSeconds);
+                    keys.add(prefix+ serachPair+ ">" + (logSeconds - 1));
+                    keys.add(prefix+serachPair+ ">" + logSeconds);
+                    keys.add(prefix+serachPair+ ">" + (logSeconds + 1));
+                    keys.add(prefix+setPair+ ">" + logSeconds);
                     String matchLogId = stringRedisTemplate.execute(redisScript, keys,String.valueOf(log.getId()));
                     if(matchLogId!=null) {
                         communicationLogMapper.setConfirmStatusWarn(Integer.valueOf(matchLogId), 'Y');

@@ -3,12 +3,15 @@ package com.oft.fittools.global;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.oft.fittools.dto.chat.MessageDTO;
 import lombok.Data;
 
 @Data
 public class SocketInfo {
     enum InfoType {
-        NEW_CONFIRM_MESSAGE_NUM
+        NEW_CONFIRM_MESSAGE_NUM,
+        CHAT_MESSAGE,
+        TARGET_ONLINE_STATUS,
     }
 
     InfoType type;
@@ -20,6 +23,20 @@ public class SocketInfo {
         SocketInfo socketInfo = new SocketInfo();
         socketInfo.type = InfoType.NEW_CONFIRM_MESSAGE_NUM;
         socketInfo.formattedMessage = num.toString();
+        return objectMapper.writeValueAsString(socketInfo);
+    }
+
+    public static String newChatMessage(MessageDTO messageDTO) throws JsonProcessingException{
+        SocketInfo socketInfo = new SocketInfo();
+        socketInfo.type = InfoType.CHAT_MESSAGE;
+        socketInfo.formattedMessage =   objectMapper.writeValueAsString(messageDTO);
+        return objectMapper.writeValueAsString(socketInfo);
+    }
+
+    public static String newTargetOnlineStatus(Boolean status) throws JsonProcessingException{
+        SocketInfo socketInfo = new SocketInfo();
+        socketInfo.type = InfoType.TARGET_ONLINE_STATUS;
+        socketInfo.formattedMessage =   objectMapper.writeValueAsString(status);
         return objectMapper.writeValueAsString(socketInfo);
     }
 }
