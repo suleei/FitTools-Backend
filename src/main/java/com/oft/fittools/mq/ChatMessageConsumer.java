@@ -28,7 +28,7 @@ public class ChatMessageConsumer implements RocketMQListener<ChatMessageDTO> {
         BeanUtils.copyProperties(chatMessageDTO, chatMessage);
         messageMapper.insert(chatMessage);
         Message<ChatMessageDTO> message = MessageBuilder.withPayload(chatMessageDTO).build();
-        Long targetTime = System.currentTimeMillis() + 2*60*1000;
+        Long targetTime = System.currentTimeMillis() + 24*60*60*1000;
         rocketMQTemplate.syncSendDeliverTimeMills("CHAT_MESSAGE_DELAY_DELETING", message, targetTime);
     }
 }

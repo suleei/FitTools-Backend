@@ -3,10 +3,12 @@ package com.oft.fittools.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.oft.fittools.controller.websocket.SocketServer;
 import com.oft.fittools.dto.chat.ChatMessageDTO;
+import com.oft.fittools.dto.chat.GetHistoryMessagesReqDTO;
 import com.oft.fittools.dto.chat.GetMessageRespDTO;
 import com.oft.fittools.dto.chat.MessageSendingReqDTO;
 import com.oft.fittools.global.SocketInfo;
 import com.oft.fittools.global.UserContextHolder;
+import com.oft.fittools.mapper.MessageMapper;
 import com.oft.fittools.po.ChatMessage;
 import com.oft.fittools.po.User;
 import com.oft.fittools.service.ChatService;
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -30,6 +33,7 @@ import java.util.Set;
 public class ChatServiceImpl implements ChatService {
     private final StringRedisTemplate stringRedisTemplate;
     private final RocketMQTemplate rocketMQTemplate;
+    private final MessageMapper messageMapper;
     private static final String prefix = "chat:";
 
     @Override
@@ -92,4 +96,24 @@ public class ChatServiceImpl implements ChatService {
         }
         return messages;
     }
+
+    @Override
+    public List<GetMessageRespDTO> getHistoryMessages(GetHistoryMessagesReqDTO getHistoryMessagesReqDTO) {
+        User user = UserContextHolder.getUser();
+        String source = user.getCall_sign();
+        if(StringUtils.isBlank(source)) throw new RuntimeException("用户呼号不能为空");
+        List<ChatMessage> messages;
+        if(getHistoryMessagesReqDTO.getTimeBefore()==null){
+            messages=messageMapper.getHistoryMessages(source, getHistoryMessagesReqDTO.getTargetCallSign());
+        }else{
+            messages=messageMapper.getHistoryMessagesBefore(source, getHistoryMessagesReqDTO.getTargetCallSign(), getHistoryMessagesReqDTO.getTimeBefore());
+        }
+        List<GetMessageRespDTO> res = new ArrayList<>();
+        for(ChatMessage message : messages) {
+            res.add(new GetMessageRespDTO(message.getTime(),message.getMessage(),message.getSource().equals(source)));
+        }
+        return res;
+    }
+
+
 }

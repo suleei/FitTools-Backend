@@ -7,4 +7,22 @@
         insert into chat_message(time, source, target, message)
         values (#{time},#{source},#{target},#{message})
     </insert>
+    <select id="getHistoryMessages" resultType="com.oft.fittools.po.ChatMessage">
+        select *
+        from (select *
+              from chat_message
+              where source = #{source} and target = #{target} or source = #{target} and target = #{source}
+              order by time desc
+              limit 50) as messages
+        order by time asc
+    </select>
+    <select id="getHistoryMessagesBefore" resultType="com.oft.fittools.po.ChatMessage">
+        select *
+        from (select *
+              from chat_message
+              where time &lt; #{before} and ( source = #{source} and target = #{target} or source = #{target} and target = #{source} )
+              order by time desc
+                  limit 50) as messages
+        order by time asc
+    </select>
 </mapper>
