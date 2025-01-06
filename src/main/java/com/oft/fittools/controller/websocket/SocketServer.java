@@ -154,10 +154,12 @@ public class SocketServer {
         }
     }
 
-    public static void sendMessage(String message, String call_sign, String dst_call_sign) throws IOException {
+    public static boolean sendMessage(String message, String call_sign, String dst_call_sign) throws IOException {
         if(StringUtils.isNotBlank(dst_call_sign)&&webSocketMap.containsKey(dst_call_sign)&&call_sign.equals(webSocketMap.get(dst_call_sign).getActive_target())) {
             webSocketMap.get(dst_call_sign).sendMessage(message);
+            return true;
         }
+        return false;
     }
 
     public String getActive_target() {

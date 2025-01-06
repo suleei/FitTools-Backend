@@ -1,6 +1,7 @@
 package com.oft.fittools.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.oft.fittools.dto.chat.GetChatListRespDTO;
 import com.oft.fittools.dto.chat.GetHistoryMessagesReqDTO;
 import com.oft.fittools.dto.chat.GetMessageRespDTO;
 import com.oft.fittools.dto.chat.MessageSendingReqDTO;
@@ -19,4 +20,6 @@ public interface ChatService {
     List<GetMessageRespDTO> getCachedMessages(@NotBlank @Size(min=1,max = 10) String targetCallSign);
 
     List<GetMessageRespDTO> getHistoryMessages(GetHistoryMessagesReqDTO getHistoryMessagesReqDTO);
+
+    List<GetChatListRespDTO> getChatList();
 }

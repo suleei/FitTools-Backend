@@ -25,4 +25,22 @@
                   limit 50) as messages
         order by time asc
     </select>
+    <select id="getChatList" resultType="com.oft.fittools.dto.chat.GetChatListRespDTO">
+        select list.target as targetCallSign, list.latest_time as latestTime, chat_message.message as message
+        from (select target, max(latest_time) as latest_time
+              from (select source as target, max(time) as latest_time
+                    from chat_message
+                    where target = #{source}
+                    group by source
+                    union
+                    select target as target, max(time) as latest_time
+                    from chat_message
+                    where source = #{source}
+                    group by target) as duplicate_list
+              group by target
+              order by latest_time desc) as list
+        join chat_message
+        on list.target = chat_message.target and chat_message.source = #{source} and latest_time = chat_message.time
+        or #{source} = chat_message.target and chat_message.source = list.target and latest_time = chat_message.time
+    </select>
 </mapper>

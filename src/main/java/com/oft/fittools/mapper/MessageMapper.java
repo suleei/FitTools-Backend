@@ -1,5 +1,6 @@
 package com.oft.fittools.mapper;
 
+import com.oft.fittools.dto.chat.GetChatListRespDTO;
 import com.oft.fittools.po.ChatMessage;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -14,4 +15,6 @@ public interface MessageMapper {
     public List<ChatMessage> getHistoryMessages(String source, String target);
 
     public List<ChatMessage> getHistoryMessagesBefore(String source, String target, Date before);
+
+    public List<GetChatListRespDTO> getChatList(String source);
 }

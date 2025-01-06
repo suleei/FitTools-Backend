@@ -2,16 +2,14 @@ package com.oft.fittools.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.oft.fittools.controller.websocket.SocketServer;
-import com.oft.fittools.dto.chat.ChatMessageDTO;
-import com.oft.fittools.dto.chat.GetHistoryMessagesReqDTO;
-import com.oft.fittools.dto.chat.GetMessageRespDTO;
-import com.oft.fittools.dto.chat.MessageSendingReqDTO;
+import com.oft.fittools.dto.chat.*;
 import com.oft.fittools.global.SocketInfo;
 import com.oft.fittools.global.UserContextHolder;
 import com.oft.fittools.mapper.MessageMapper;
 import com.oft.fittools.po.ChatMessage;
 import com.oft.fittools.po.User;
 import com.oft.fittools.service.ChatService;
+import com.oft.fittools.service.MessageNotifyService;
 import com.oft.fittools.service.NearByHamService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -34,6 +32,7 @@ public class ChatServiceImpl implements ChatService {
     private final StringRedisTemplate stringRedisTemplate;
     private final RocketMQTemplate rocketMQTemplate;
     private final MessageMapper messageMapper;
+    private final MessageNotifyService messageNotifyService;
     private static final String prefix = "chat:";
 
     @Override
@@ -43,7 +42,12 @@ public class ChatServiceImpl implements ChatService {
         BeanUtils.copyProperties(messageSendingReqDTO, chatMessageDTO);
         chatMessageDTO.setSource(UserContextHolder.getUser().getCall_sign());
         try {
-            SocketServer.sendMessage(SocketInfo.newChatMessage(chatMessageDTO), chatMessageDTO.getSource(), chatMessageDTO.getTarget());
+            if(!SocketServer.sendMessage(SocketInfo.newChatMessage(chatMessageDTO), chatMessageDTO.getSource(), chatMessageDTO.getTarget())){
+                /*messageNotifyService.notify(chatMessageDTO.getTarget(),UserContextHolder.getUser().getCall_sign());*/
+                chatMessageDTO.setNotify(true);
+            }else{
+                chatMessageDTO.setNotify(false);
+            }
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
         }
@@ -115,5 +119,17 @@ public class ChatServiceImpl implements ChatService {
         return res;
     }
 
-
+    @Override
+    public List<GetChatListRespDTO> getChatList() {
+        String source = UserContextHolder.getUser().getCall_sign();
+        if(StringUtils.isBlank(source)) throw new RuntimeException("用户呼号不能为空");
+        List<GetChatListRespDTO> res = messageMapper.getChatList(source);
+        Set<String> set = messageNotifyService.getGuestSet();
+        for(GetChatListRespDTO respDTO : res) {
+            if(set.contains(respDTO.getTargetCallSign())){
+                respDTO.setHasNewMessage(true);
+            }else respDTO.setHasNewMessage(false);
+        }
+        return res;
+    }
 }

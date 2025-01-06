@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.oft.fittools.dto.chat.ChatMessageDTO;
+import com.oft.fittools.dto.chat.MessageNotifyDTO;
 import lombok.Data;
 
 @Data
@@ -13,6 +14,7 @@ public class SocketInfo {
         NEW_CONFIRM_MESSAGE_NUM,
         CHAT_MESSAGE,
         TARGET_ONLINE_STATUS,
+        MESSAGE_NOTIFY
     }
 
     InfoType type;
@@ -38,6 +40,13 @@ public class SocketInfo {
         SocketInfo socketInfo = new SocketInfo();
         socketInfo.type = InfoType.TARGET_ONLINE_STATUS;
         socketInfo.formattedMessage =   objectMapper.writeValueAsString(status);
+        return objectMapper.writeValueAsString(socketInfo);
+    }
+
+    public static String newMessageNotify(MessageNotifyDTO messageNotifyDTO) throws JsonProcessingException{
+        SocketInfo socketInfo = new SocketInfo();
+        socketInfo.type = InfoType.MESSAGE_NOTIFY;
+        socketInfo.formattedMessage =   JSON.toJSONString(messageNotifyDTO);
         return objectMapper.writeValueAsString(socketInfo);
     }
 }

@@ -3,6 +3,7 @@ package com.oft.fittools.mq;
 import com.oft.fittools.dto.chat.ChatMessageDTO;
 import com.oft.fittools.mapper.MessageMapper;
 import com.oft.fittools.po.ChatMessage;
+import com.oft.fittools.service.MessageNotifyService;
 import lombok.RequiredArgsConstructor;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
 import org.apache.rocketmq.spring.core.RocketMQListener;
@@ -20,10 +21,18 @@ import org.springframework.transaction.annotation.Transactional;
 public class ChatMessageConsumer implements RocketMQListener<ChatMessageDTO> {
     private final MessageMapper messageMapper;
     private final RocketMQTemplate rocketMQTemplate;
+    private final MessageNotifyService messageNotifyService;
 
     @Override
-    @Transactional
     public void onMessage(ChatMessageDTO chatMessageDTO) {
+        transactionalOperation(chatMessageDTO);
+        if(chatMessageDTO.isNotify()){
+            messageNotifyService.notify(chatMessageDTO.getTarget(),chatMessageDTO.getSource());
+        }
+    }
+
+    @Transactional
+    protected void transactionalOperation(ChatMessageDTO chatMessageDTO){
         ChatMessage chatMessage = new ChatMessage();
         BeanUtils.copyProperties(chatMessageDTO, chatMessage);
         messageMapper.insert(chatMessage);
