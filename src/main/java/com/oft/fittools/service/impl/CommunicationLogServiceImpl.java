@@ -3,8 +3,10 @@ package com.oft.fittools.service.impl;
 import com.oft.fittools.dto.log.CommunicationLogDTO;
 import com.oft.fittools.dto.log.CommunicationLogPageDTO;
 import com.oft.fittools.global.UserContextHolder;
+import com.oft.fittools.mapper.ActivityMapper;
 import com.oft.fittools.mapper.CommunicationLogMapper;
 import com.oft.fittools.mapper.UserMapper;
+import com.oft.fittools.po.Activity;
 import com.oft.fittools.po.CommunicationLog;
 import com.oft.fittools.po.User;
 import com.oft.fittools.service.CallSignBloomFilterService;
@@ -16,6 +18,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -28,6 +31,7 @@ import java.util.concurrent.Executors;
 public class CommunicationLogServiceImpl implements CommunicationLogService {
     private final UserMapper userMapper;
     private final CommunicationLogMapper communicationLogMapper;
+    private final ActivityMapper activityMapper;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final LogConfirmNotifyService logConfirmNotifyService;
     private final CallSignBloomFilterService callSignBloomFilterService;
@@ -36,6 +40,7 @@ public class CommunicationLogServiceImpl implements CommunicationLogService {
     private static final String prefix = "log_match:";
 
     @Override
+    @Transactional
     public void insert(CommunicationLogDTO communicationLog) {
         communicationLog.setDuration(communicationLog.getEnd_time().getTime() - communicationLog.getStart_time().getTime());
         if(communicationLog.getDuration()<=0) throw new RuntimeException("结束时间必须大于开始时间");
@@ -80,6 +85,10 @@ public class CommunicationLogServiceImpl implements CommunicationLogService {
             }
             if(!match) logConfirmNotifyService.notify(log.getTarget_call_sign());
         });
+        if(communicationLog.getPublish_activity()){
+            Activity activity = new Activity(log.getId(),log.getStart_time(),UserContextHolder.getUser().getId(),log.getSource_call_sign(),log.getTarget_call_sign(),log.getDistance());
+            activityMapper.insert(activity);
+        }
     }
 
     @Override

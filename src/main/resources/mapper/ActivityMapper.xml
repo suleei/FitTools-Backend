@@ -1,0 +1,51 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.oft.fittools.mapper.ActivityMapper">
+    <insert id="insert">
+        insert into activity(log_id, start_time, publisher, source, target, distance)
+        values (#{log_id}, #{start_time}, #{publisher}, #{source}, #{target}, #{distance})
+    </insert>
+    <select id="getActivities" resultType="com.oft.fittools.dto.activity.GetActivityRespDTO">
+        select
+            ids_publisher_log.id as id,
+            communication_log.source_call_sign as source,
+            user.avatar as avatar,
+            communication_log.target_call_sign as target,
+            communication_log.source_district as sourceAddress,
+            communication_log.source_lng as sourceLng,
+            communication_log.source_lat as sourceLat,
+            communication_log.target_address as targetAddress,
+            communication_log.target_lng as targetLng,
+            communication_log.target_lat as targetLat,
+            communication_log.distance as distance,
+            communication_log.start_time as startTime,
+            ids_thumbs_count.thumbs_count as thumbsCount,
+            ids_thumbsed.thumbsed as thumbsed
+        from (select id, publisher, log_id
+              from activity
+              order by start_time desc, id desc
+              limit 10) as ids_publisher_log
+                 join user on user.id = ids_publisher_log.publisher
+                 join communication_log on communication_log.id = ids_publisher_log.log_id
+                 join (select id, activity_id is not null as thumbsed
+                       from (select id
+                             from activity
+                             order by start_time desc, id desc
+                             limit 10) as ids
+                             left join (select activity_id
+                             from activity_thumbs_up
+                             where user_id = #{userId}) as thumbsed
+                             on ids.id = thumbsed.activity_id) as ids_thumbsed
+                 on ids_thumbsed.id = ids_publisher_log.id
+                 join (select ids.id as id, count(user_id) as thumbs_count
+                       from (select id
+                             from activity
+                             order by start_time desc, id desc
+                             limit 10) as ids
+                                left join activity_thumbs_up on ids.id = activity_thumbs_up.activity_id
+                       group by ids.id) as ids_thumbs_count
+                 on ids_thumbs_count.id = ids_publisher_log.id;
+    </select>
+</mapper>

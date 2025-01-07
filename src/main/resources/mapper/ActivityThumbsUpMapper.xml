@@ -1,0 +1,22 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.oft.fittools.mapper.ActivityThumbsUpMapper">
+
+    <insert id="addThumbsUp">
+        insert into activity_thumbs_up(activity_id,user_id)
+        values (#{activityId},#{userId})
+    </insert>
+    <delete id="deleteThumbsUp">
+        delete from activity_thumbs_up
+        where id = #{id}
+    </delete>
+    <select id="getThumbsUp" resultType="java.lang.Integer">
+        select id
+        from activity_thumbs_up
+        where activity_id = #{activityId} and user_id = #{userId}
+    </select>
+
+
+</mapper>

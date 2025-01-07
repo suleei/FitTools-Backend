@@ -77,4 +77,7 @@ public class CommunicationLogDTO {
     @NotNull
     Double distance;
     Long duration;
+
+    @NotNull(message = "指定是否发布活动不能为空")
+    Boolean publish_activity;
 }
