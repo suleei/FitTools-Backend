@@ -1,0 +1,31 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.oft.fittools.mapper.ActivityCommentMapper">
+    <insert id="addComment" useGeneratedKeys="true" keyProperty="id">
+        insert into activity_comment(activity_id, activity_user_id, commenter_user_id, commenter_call_sign, comment, time, reply_call_sign)
+        values (#{activityId}, #{activityUserId}, #{commenterUserId}, #{commenterCallSign}, #{comment}, #{time}, #{replyCallSign})
+    </insert>
+    <delete id="deleteComment">
+        delete
+        from activity_comment
+        where id = #{commentId} and (activity_user_id = #{userId} or commenter_user_id = #{userId})
+    </delete>
+    <select id="getComments" resultType="com.oft.fittools.dto.activity.ActivityCommentDTO">
+        select
+            comments.id as id,
+            comments.commenter_call_sign as commenterCallSign,
+            comments.comment as comment,
+            comments.time as time,
+            comments.deletable as deletable,
+            comments.reply_call_sign as replyCallSign,
+            user.avatar as commenterAvatar
+        from (select id, commenter_user_id,commenter_call_sign, comment, time,activity_user_id = #{userId} or commenter_user_id = #{userId} as deletable, reply_call_sign
+              from activity_comment
+              where activity_id = #{activityId}) as comments
+        left join user
+        on comments.commenter_user_id = user.id
+        order by time asc
+    </select>
+</mapper>

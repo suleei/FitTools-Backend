@@ -23,4 +23,5 @@ public class GetActivityRespDTO {
     Date startTime;
     Integer thumbsCount;
     Boolean thumbsed;
+    Integer commentsCount;
 }

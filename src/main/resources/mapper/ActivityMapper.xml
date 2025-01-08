@@ -22,9 +22,11 @@
             communication_log.distance as distance,
             communication_log.start_time as startTime,
             ids_thumbs_count.thumbs_count as thumbsCount,
-            ids_thumbsed.thumbsed as thumbsed
+            ids_thumbsed.thumbsed as thumbsed,
+            ids_comments_count.comments_count as commentsCount
         from (select id, publisher, log_id
               from activity
+                <if test="startTime!= null and id != null">where start_time &lt;= #{startTime} and id &lt; #{id} </if>
               order by start_time desc, id desc
               limit 10) as ids_publisher_log
                  join user on user.id = ids_publisher_log.publisher
@@ -32,6 +34,7 @@
                  join (select id, activity_id is not null as thumbsed
                        from (select id
                              from activity
+                             <if test="startTime!= null and id != null">where start_time &lt;= #{startTime} and id &lt; #{id} </if>
                              order by start_time desc, id desc
                              limit 10) as ids
                              left join (select activity_id
@@ -42,10 +45,26 @@
                  join (select ids.id as id, count(user_id) as thumbs_count
                        from (select id
                              from activity
+                             <if test="startTime!= null and id != null">where start_time &lt;= #{startTime} and id &lt; #{id} </if>
                              order by start_time desc, id desc
                              limit 10) as ids
                                 left join activity_thumbs_up on ids.id = activity_thumbs_up.activity_id
                        group by ids.id) as ids_thumbs_count
-                 on ids_thumbs_count.id = ids_publisher_log.id;
+                 on ids_thumbs_count.id = ids_publisher_log.id
+                 join (select ids.id, count(activity_comment.id) as comments_count
+                       from (select id
+                             from activity
+                             <if test="startTime!= null and id != null">where start_time &lt;= #{startTime} and id &lt; #{id} </if>
+                             order by start_time desc, id desc
+                             limit 10) as ids
+                             left join activity_comment
+                             on ids.id = activity_comment.activity_id
+                       group by ids.id) as ids_comments_count
+                 on ids_comments_count.id = ids_publisher_log.id
+    </select>
+    <select id="getActivityUserIdByActivityId" resultType="java.lang.Integer">
+        select publisher
+        from activity
+        where id = #{activityId}
     </select>
 </mapper>
