@@ -7,6 +7,10 @@
         insert into activity(log_id, start_time, publisher, source, target, distance)
         values (#{log_id}, #{start_time}, #{publisher}, #{source}, #{target}, #{distance})
     </insert>
+    <delete id="delete">
+        delete from activity
+        where id = #{id} and publisher = #{userId}
+    </delete>
     <select id="getActivities" resultType="com.oft.fittools.dto.activity.GetActivityRespDTO">
         select
             ids_publisher_log.id as id,
@@ -66,5 +70,58 @@
         select publisher
         from activity
         where id = #{activityId}
+    </select>
+    <select id="getCommentedActivities" resultType="com.oft.fittools.dto.activity.GetActivityRespDTO">
+        select
+    ids_publisher_log.id as id,
+    communication_log.source_call_sign as source,
+    user.avatar as avatar,
+    communication_log.target_call_sign as target,
+    communication_log.source_district as sourceAddress,
+    communication_log.source_lng as sourceLng,
+    communication_log.source_lat as sourceLat,
+    communication_log.target_address as targetAddress,
+    communication_log.target_lng as targetLng,
+    communication_log.target_lat as targetLat,
+    communication_log.distance as distance,
+    communication_log.start_time as startTime,
+    ids_thumbs_count.thumbs_count as thumbsCount,
+    ids_thumbsed.thumbsed as thumbsed,
+    ids_comments_count.comments_count as commentsCount,
+    ids_publisher_log.publisher = #{userId} as deletable
+from (select id, publisher, log_id
+      from activity
+      where id in (<foreach collection="ids" item="id" separator=",">#{id}</foreach>)
+      order by start_time desc, id desc
+      limit 10) as ids_publisher_log
+         join user on user.id = ids_publisher_log.publisher
+         join communication_log on communication_log.id = ids_publisher_log.log_id
+         join (select id, activity_id is not null as thumbsed
+               from (select id
+                     from activity
+                     where id in (<foreach collection="ids" item="id" separator=",">#{id}</foreach>)
+                     limit 10) as ids
+                        left join (select activity_id
+                                   from activity_thumbs_up
+                                   where user_id = #{userId}) as thumbsed
+                                   on ids.id = thumbsed.activity_id) as ids_thumbsed
+                                  on ids_thumbsed.id = ids_publisher_log.id
+                        join (select ids.id as id, count(user_id) as thumbs_count
+                              from (select id
+                                    from activity
+                                    where id in (<foreach collection="ids" item="id" separator=",">#{id}</foreach>)
+                                    limit 10) as ids
+                                       left join activity_thumbs_up on ids.id = activity_thumbs_up.activity_id
+                              group by ids.id) as ids_thumbs_count
+                             on ids_thumbs_count.id = ids_publisher_log.id
+                        join (select ids.id, count(activity_comment.id) as comments_count
+                              from (select id
+                                    from activity
+                                    where id in (<foreach collection="ids" item="id" separator=",">#{id}</foreach>)
+                                    limit 10) as ids
+                                       left join activity_comment
+                                                 on ids.id = activity_comment.activity_id
+                              group by ids.id) as ids_comments_count
+                             on ids_comments_count.id = ids_publisher_log.id
     </select>
 </mapper>

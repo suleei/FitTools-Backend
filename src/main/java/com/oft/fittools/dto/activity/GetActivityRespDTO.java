@@ -24,4 +24,5 @@ public class GetActivityRespDTO {
     Integer thumbsCount;
     Boolean thumbsed;
     Integer commentsCount;
+    Boolean deletable;
 }

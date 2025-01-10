@@ -27,4 +27,6 @@ public interface UserMapper {
     void setDevice(Integer deviceId, Integer userId);
 
     void setCallSign(String callSign, Integer userId);
+
+    User getUserById(Integer userId);
 }

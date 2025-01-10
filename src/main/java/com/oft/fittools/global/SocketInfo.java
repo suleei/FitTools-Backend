@@ -14,7 +14,8 @@ public class SocketInfo {
         NEW_CONFIRM_MESSAGE_NUM,
         CHAT_MESSAGE,
         TARGET_ONLINE_STATUS,
-        MESSAGE_NOTIFY
+        MESSAGE_NOTIFY,
+        COMMENT_NOTIFY
     }
 
     InfoType type;
@@ -47,6 +48,13 @@ public class SocketInfo {
         SocketInfo socketInfo = new SocketInfo();
         socketInfo.type = InfoType.MESSAGE_NOTIFY;
         socketInfo.formattedMessage =   JSON.toJSONString(messageNotifyDTO);
+        return objectMapper.writeValueAsString(socketInfo);
+    }
+
+    public static String newCommentNotify(Long cardinality) throws JsonProcessingException{
+        SocketInfo socketInfo = new SocketInfo();
+        socketInfo.type = InfoType.COMMENT_NOTIFY;
+        socketInfo.formattedMessage =   JSON.toJSONString(cardinality);
         return objectMapper.writeValueAsString(socketInfo);
     }
 }
